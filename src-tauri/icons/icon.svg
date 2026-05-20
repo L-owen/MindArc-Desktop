@@ -1,0 +1,84 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d0d2b"/>
+      <stop offset="100%" stop-color="#1a0a2e"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="50%" stop-color="#448aff"/>
+      <stop offset="100%" stop-color="#b388ff"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00e5ff"/>
+      <stop offset="100%" stop-color="#7c4dff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glowStrong">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#00e5ff"/>
+      <stop offset="70%" stop-color="#448aff"/>
+      <stop offset="100%" stop-color="#b388ff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#neon)" stroke-width="2" opacity="0.3"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#neon)" stroke-width="1" opacity="0.15"/>
+
+  <polyline points="120,100 145,200 130,200 170,310 155,310 200,420"
+            fill="none" stroke="url(#bolt)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
+            filter="url(#glow)" opacity="0.8"/>
+  <polyline points="145,200 175,230"
+            fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"
+            filter="url(#glow)" opacity="0.6"/>
+  <polyline points="170,310 200,335"
+            fill="none" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"
+            filter="url(#glow)" opacity="0.5"/>
+
+  <polyline points="392,100 367,200 382,200 342,310 357,310 312,420"
+            fill="none" stroke="url(#bolt)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
+            filter="url(#glow)" opacity="0.8"/>
+  <polyline points="367,200 337,230"
+            fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"
+            filter="url(#glow)" opacity="0.6"/>
+  <polyline points="342,310 312,335"
+            fill="none" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"
+            filter="url(#glow)" opacity="0.5"/>
+
+  <polyline points="90,220 110,250 95,250 120,290"
+            fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"
+            filter="url(#glow)" opacity="0.4"/>
+  <polyline points="422,220 402,250 417,250 392,290"
+            fill="none" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"
+            filter="url(#glow)" opacity="0.4"/>
+
+  <text x="256" y="310" font-size="200" font-weight="900" font-family="'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif"
+        fill="url(#textGrad)" text-anchor="middle"
+        filter="url(#glowStrong)">念</text>
+
+  <path d="M156,410 Q180,395 200,410 Q220,425 240,410 Q260,395 280,410 Q300,425 320,410 Q340,395 356,410"
+        fill="none" stroke="url(#neon)" stroke-width="1.5" opacity="0.3"
+        filter="url(#glow)"/>
+
+  <circle cx="100" cy="100" r="3" fill="#00e5ff" filter="url(#glow)" opacity="0.6"/>
+  <circle cx="412" cy="100" r="3" fill="#7c4dff" filter="url(#glow)" opacity="0.6"/>
+  <circle cx="100" cy="412" r="2" fill="#448aff" filter="url(#glow)" opacity="0.4"/>
+  <circle cx="412" cy="412" r="2" fill="#00e5ff" filter="url(#glow)" opacity="0.4"/>
+</svg>

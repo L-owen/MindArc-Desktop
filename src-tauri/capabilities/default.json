@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "MindArc default capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "dialog:default",
+    "fs:default",
+    "fs:allow-home-read",
+    "fs:allow-home-write",
+    "fs:allow-app-read-recursive",
+    "fs:allow-app-write-recursive",
+    "notification:default"
+  ]
+}

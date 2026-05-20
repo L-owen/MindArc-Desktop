@@ -1,0 +1,2964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>闪念 — 心有所念，落笔成篇</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%2300e5ff'/><stop offset='50%25' stop-color='%23448aff'/><stop offset='100%25' stop-color='%23b388ff'/></linearGradient></defs><rect width='100' height='100' rx='20' fill='%230a0a1a'/><text x='50' y='68' font-size='52' font-weight='bold' font-family='sans-serif' fill='url(%23g)' text-anchor='middle'>念</text></svg>">
+<style>
+/* ========== 设计令牌 / Design Tokens ========== */
+:root {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #12122a;
+  --bg-tertiary: #1a1a3e;
+  --text-primary: #e0e8ff;
+  --text-secondary: #7a80a8;
+  --accent-cyan: #00e5ff;
+  --accent-blue: #448aff;
+  --accent-purple: #b388ff;
+  --accent-pink: #ea80fc;
+  --gradient-main: linear-gradient(135deg, #00e5ff 0%, #448aff 50%, #b388ff 100%);
+  --gradient-warm: linear-gradient(135deg, #448aff 0%, #b388ff 50%, #ea80fc 100%);
+  --gradient-cool: linear-gradient(135deg, #00e5ff 0%, #448aff 100%);
+  --success: #00e5ff;
+  --danger: #ff4081;
+  --border-subtle: rgba(100, 140, 255, 0.08);
+  --shadow-card: 0 2px 12px rgba(0, 229, 255, 0.06), 0 0 1px rgba(0, 229, 255, 0.1);
+  --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.15);
+  --glow-purple: 0 0 20px rgba(179, 136, 255, 0.15);
+  --radius: 12px;
+  --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --max-width: 960px;
+  --ui-font-size: 16px;
+}
+
+html { font-size: var(--ui-font-size); }
+
+/* ========== 重置与基础 / Reset & Base ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-stack);
+  background: var(--bg-primary);
+  background-image: 
+    radial-gradient(ellipse at 20% 50%, rgba(0, 229, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(179, 136, 255, 0.03) 0%, transparent 50%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-y: scroll;
+}
+
+/* ========== 滚动条 / Scrollbar ========== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+/* ========== 布局容器 / Layout ========== */
+.app-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 20px;
+  padding-bottom: 200px; /* space for fixed bottom bar */
+}
+
+/* ========== 头部 / Header ========== */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-primary);
+  padding-top: 18px;
+  padding-bottom: 14px;
+}
+
+/* 头部渐变光晕 */
+header::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 120px;
+  background: radial-gradient(ellipse, rgba(0, 229, 255, 0.10) 0%, rgba(68, 138, 255, 0.06) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.header-top h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.file-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.file-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  transition: background var(--transition);
+}
+
+.file-dot.connected { background: var(--accent-cyan); box-shadow: 0 0 6px rgba(0, 229, 255, 0.5); }
+
+.btn-change-file {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--font-stack);
+}
+
+.btn-change-file:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+/* ========== 输入区 / Input Area (moved to bottom bar) ========== */
+.input-area {
+  display: none; /* hidden — the input area is now in #bottomBar */
+}
+
+/* ========== 底部输入栏 / Bottom Input Bar ========== */
+#bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: rgba(10, 10, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(0, 229, 255, 0.12);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3), 0 0 12px rgba(0, 229, 255, 0.06);
+  padding: 12px 20px 16px;
+}
+
+.bottom-bar-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.bottom-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.bottom-bar-row:last-child {
+  margin-bottom: 0;
+}
+
+.bottom-bar-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  margin-right: 2px;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.bottom-bar-divider {
+  color: rgba(0, 229, 255, 0.25);
+  font-size: 1rem;
+  line-height: 1;
+  margin: 0 4px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* Compact priority selector in bottom bar */
+#bottomBar .priority-selector {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+#bottomBar .priority-btn {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 5px;
+  gap: 3px;
+}
+#bottomBar .priority-btn::before {
+  width: 5px;
+  height: 5px;
+}
+
+/* Compact tag selector in bottom bar */
+#bottomBar .tag-selector {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+#bottomBar .tag-btn {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 14px;
+}
+#bottomBar .tag-btn-add {
+  font-size: 0.75rem;
+  padding: 1px 7px;
+  border-radius: 14px;
+}
+
+/* Bottom bar textarea row */
+.bottom-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.bottom-input-row textarea {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: var(--font-stack);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  resize: none;
+  overflow-y: auto;
+  max-height: 8em;
+  min-height: 4.5em;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.bottom-input-row textarea::placeholder { color: var(--text-secondary); }
+.bottom-input-row textarea:focus {
+  border-color: rgba(0, 229, 255, 0.4);
+}
+
+.bottom-input-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+#bottomBar:focus-within .bottom-input-hint { opacity: 1; }
+
+.bottom-input-hint #charCount {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+/* 设提醒 button */
+.btn-reminder {
+  background: transparent;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  color: var(--accent-cyan);
+  font-size: 1rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.btn-reminder:hover {
+  border-color: rgba(0, 229, 255, 0.5);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.15);
+}
+
+.btn-reminder.reminder-active {
+  border-color: rgba(0, 229, 255, 0.5);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+  animation: reminderBtnGlow 3s ease-in-out infinite;
+}
+
+@keyframes reminderBtnGlow {
+  0%, 100% { box-shadow: 0 0 6px rgba(0, 229, 255, 0.15); }
+  50% { box-shadow: 0 0 14px rgba(0, 229, 255, 0.35); }
+}
+
+/* ========== 过滤器 / Filter Tabs ========== */
+.filter-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 3px;
+  flex: 1 1 auto;
+  min-width: 240px;
+}
+
+.filter-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-stack);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.filter-tab:hover { color: var(--text-primary); }
+
+.filter-tab.active {
+  background: rgba(0, 229, 255, 0.08);
+  color: var(--accent-cyan);
+}
+
+.filter-badge {
+  font-size: 0.7rem;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 1px 6px;
+  border-radius: 8px;
+  min-width: 18px;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.filter-tab.active .filter-badge {
+  background: var(--gradient-main);
+  color: #fff;
+}
+
+/* ========== 搜索 / Search ========== */
+.search-area {
+  flex: 1 1 auto;
+  min-width: 120px;
+  position: relative;
+}
+
+.search-area input {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 6px 10px 6px 28px;
+  color: var(--text-primary);
+  font-family: var(--font-stack);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.search-area input::placeholder { color: var(--text-secondary); }
+.search-area input:focus { border-color: rgba(0, 229, 255, 0.4); }
+
+.search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  pointer-events: none;
+}
+
+.search-area input {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 6px 12px 6px 30px;
+  color: var(--text-primary);
+  font-family: var(--font-stack);
+  font-size: 0.78rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.search-area input::placeholder { color: var(--text-secondary); }
+.search-area input:focus { border-color: rgba(0, 229, 255, 0.4); }
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  pointer-events: none;
+}
+
+/* ========== 想法卡片 / Thought Cards ========== */
+.thought-list { display: flex; flex-direction: column; gap: 5px; }
+
+.thought-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), opacity var(--transition);
+  animation: cardAppear 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* 左侧彩色条 — 按标签着色 */
+.thought-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--gradient-main);
+  transition: background var(--transition);
+}
+
+.thought-card[data-tag="Team"]::before { background: #ff4081; }
+.thought-card[data-tag="AI"]::before    { background: #00e5ff; }
+.thought-card[data-tag="Coding"]::before{ background: #ffab40; }
+.thought-card[data-tag="Mine"]::before  { background: var(--gradient-main); }
+
+.thought-card.completed::before { opacity: 0.5; }
+
+.thought-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card), var(--glow-cyan);
+  border-color: rgba(0, 229, 255, 0.15);
+}
+
+.thought-card.completed {
+  opacity: 0.5;
+  border-color: rgba(0, 229, 255, 0.05);
+}
+
+/* 卡片出现动画 */
+@keyframes cardAppear {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 卡片删除动画 */
+.thought-card.removing {
+  animation: cardRemove 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes cardRemove {
+  to { opacity: 0; transform: scale(0.95) translateX(20px); height: 0; padding: 0; margin: 0; border-width: 0; overflow: hidden; }
+}
+
+/* 卡片成功闪烁 */
+.thought-card.success-flash {
+  animation: successFlash 600ms ease;
+}
+
+@keyframes successFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.3); }
+  50%  { box-shadow: 0 0 0 6px rgba(0, 229, 255, 0.1); }
+  100% { box-shadow: none; }
+}
+
+.card-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* 完成勾选按钮 */
+.btn-toggle {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-tertiary);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  margin-top: 1px;
+  padding: 0;
+}
+
+.btn-toggle:hover { border-color: var(--accent-cyan); }
+
+.btn-toggle.checked {
+  background: var(--gradient-main);
+  border-color: transparent;
+}
+
+.btn-toggle .check-icon {
+  display: none;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.btn-toggle.checked .check-icon { display: block; }
+
+.card-body { flex: 1; min-width: 0; }
+
+.card-text {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  word-break: break-word;
+  white-space: pre-wrap;
+  transition: all var(--transition);
+}
+
+.thought-card.completed .card-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.card-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.card-abs-time {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  opacity: 0.45;
+  text-align: right;
+  margin-top: 0px;
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all var(--transition);
+  opacity: 0;
+  font-family: var(--font-stack);
+  line-height: 1;
+}
+
+.thought-card:hover .btn-delete { opacity: 1; }
+.btn-delete:hover { color: var(--danger); background: rgba(255, 64, 129, 0.1); }
+
+.btn-edit {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  transition: all var(--transition);
+  opacity: 0;
+  font-family: var(--font-stack);
+  line-height: 1;
+}
+
+.thought-card:hover .btn-edit { opacity: 1; }
+.btn-edit:hover { color: var(--accent-cyan); background: rgba(0, 229, 255, 0.08); text-shadow: 0 0 6px rgba(0, 229, 255, 0.4); }
+
+.card-edit-area {
+  width: 100%;
+  background: rgba(5, 5, 20, 0.95);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  border-left: 3px solid rgba(0, 229, 255, 0.7);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: var(--font-stack);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  resize: none;
+  outline: none;
+  min-height: 2em;
+  position: relative;
+  animation: editAreaAppear 200ms cubic-bezier(0.4, 0, 0.2, 1),
+             editPulseLeft 2s ease-in-out infinite;
+  box-shadow: inset 0 0 12px rgba(0, 229, 255, 0.03),
+              0 0 1px rgba(0, 229, 255, 0.2);
+}
+
+.card-edit-area:focus {
+  border-color: rgba(0, 229, 255, 0.4);
+  border-left-color: var(--accent-cyan);
+  box-shadow: inset 0 0 12px rgba(0, 229, 255, 0.05),
+              0 0 8px rgba(0, 229, 255, 0.12);
+}
+
+@keyframes editAreaAppear {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes editPulseLeft {
+  0%, 100% { border-left-color: rgba(0, 229, 255, 0.5); }
+  50% { border-left-color: rgba(0, 229, 255, 0.9); }
+}
+
+.card-edit-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Editing indicator — blinking dot */
+.card-edit-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: auto;
+  font-size: 0.6rem;
+  color: var(--accent-cyan);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.card-edit-indicator::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  animation: editDotBlink 1s ease-in-out infinite;
+  box-shadow: 0 0 4px rgba(0, 229, 255, 0.6);
+}
+
+@keyframes editDotBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.btn-save-edit, .btn-cancel-edit {
+  background: transparent;
+  border: 1px solid;
+  padding: 3px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-family: var(--font-stack);
+  font-weight: 500;
+  transition: all var(--transition);
+  letter-spacing: 0.03em;
+}
+
+.btn-save-edit {
+  border-color: rgba(0, 229, 255, 0.35);
+  color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.06);
+}
+.btn-save-edit:hover {
+  background: rgba(0, 229, 255, 0.15);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.15),
+              inset 0 0 6px rgba(0, 229, 255, 0.05);
+  border-color: rgba(0, 229, 255, 0.6);
+}
+
+.btn-cancel-edit {
+  border-color: rgba(122, 128, 168, 0.25);
+  color: var(--text-secondary);
+}
+.btn-cancel-edit:hover {
+  color: var(--text-primary);
+  border-color: rgba(122, 128, 168, 0.5);
+  background: rgba(122, 128, 168, 0.08);
+}
+
+/* 行内删除确认 */
+.delete-confirm {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.delete-confirm.visible { display: flex; }
+
+.delete-confirm span { color: var(--text-secondary); }
+
+.btn-confirm-yes, .btn-confirm-no {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+}
+
+.btn-confirm-yes { border-color: rgba(255, 64, 129, 0.3); color: var(--danger); }
+.btn-confirm-yes:hover { background: rgba(255, 64, 129, 0.15); }
+.btn-confirm-no:hover { color: var(--text-primary); }
+
+/* ========== 空状态 / Empty States ========== */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: block;
+  filter: grayscale(0.3);
+}
+
+/* 赛博朋克空状态图标 */
+.empty-icon-cyber {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  display: block;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.3));
+  letter-spacing: 0.1em;
+  font-weight: 300;
+}
+
+.empty-text {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  margin-top: 8px;
+}
+
+/* ========== 欢迎屏 / Welcome Screen ========== */
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: var(--bg-primary);
+  background-image: 
+    radial-gradient(ellipse at 30% 40%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(179, 136, 255, 0.06) 0%, transparent 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 400ms ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.welcome-card {
+  text-align: center;
+  max-width: 420px;
+  padding: 40px 32px;
+}
+
+.welcome-card h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 欢迎标题装饰线 */
+.welcome-card h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  margin: 12px auto 0;
+  background: var(--gradient-main);
+  border-radius: 1px;
+  box-shadow: var(--glow-cyan);
+}
+
+.welcome-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 32px;
+  line-height: 1.6;
+  text-wrap: balance;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.welcome-card p + p {
+  margin-top: -24px;
+  white-space: nowrap;
+}
+
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-primary {
+  background: var(--gradient-main);
+  color: #fff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 10px;
+  font-family: var(--font-stack);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  min-width: 220px;
+}
+
+.btn-primary:hover { box-shadow: var(--glow-cyan); transform: translateY(-1px); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 28px;
+  border-radius: 10px;
+  font-family: var(--font-stack);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  min-width: 220px;
+}
+
+.btn-secondary:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+/* ========== 降级模式提示 / Fallback Notice ========== */
+.fallback-notice {
+  background: rgba(0, 229, 255, 0.06);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fallback-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fallback-actions button {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+}
+
+.fallback-actions button:hover { border-color: var(--accent-cyan); }
+
+/* ========== 响应式 / Responsive ========== */
+@media (max-width: 480px) {
+  .app-container { padding: 0 12px; padding-bottom: 160px; }
+  header { padding-top: 8px; }
+  .header-top h1 { font-size: 1rem; }
+  .thought-card { padding: 12px 14px; }
+  .btn-delete { opacity: 0.6; }
+  .welcome-card { padding: 32px 20px; }
+  .welcome-card h2 { font-size: 1.6rem; }
+
+  #bottomBar { padding: 8px 12px 10px; }
+  #bottomBar .priority-btn { font-size: 0.62rem; padding: 2px 6px; }
+  #bottomBar .tag-btn { font-size: 0.62rem; padding: 1px 6px; }
+}
+
+/* ========== 无障碍 / Accessibility ========== */
+*:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========== 优先级选择器 / Priority Selector ========== */
+.priority-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.priority-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.priority-btn::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.priority-btn.q1::before { background: #ff4081; }
+.priority-btn.q2::before { background: #00e5ff; }
+.priority-btn.q3::before { background: #ffab40; }
+.priority-btn.q4::before { background: #7a80a8; }
+
+.priority-btn.active {
+  color: var(--text-primary);
+}
+.priority-btn.q1.active { border-color: rgba(255,64,129,0.5); background: rgba(255,64,129,0.1); }
+.priority-btn.q2.active { border-color: rgba(0,229,255,0.5); background: rgba(0,229,255,0.1); }
+.priority-btn.q3.active { border-color: rgba(255,171,64,0.5); background: rgba(255,171,64,0.1); }
+.priority-btn.q4.active { border-color: rgba(122,128,168,0.5); background: rgba(122,128,168,0.1); }
+
+/* ========== 优先级标签 / Priority Tag ========== */
+.priority-tag {
+  font-size: 0.68rem;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.priority-tag:hover { filter: brightness(1.3); }
+.priority-tag.q1 { color: #ff4081; background: rgba(255,64,129,0.1); border: 1px solid rgba(255,64,129,0.2); }
+.priority-tag.q2 { color: #00e5ff; background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); }
+.priority-tag.q3 { color: #ffab40; background: rgba(255,171,64,0.1); border: 1px solid rgba(255,171,64,0.2); }
+.priority-tag.q4 { color: #7a80a8; background: rgba(122,128,168,0.1); border: 1px solid rgba(122,128,168,0.2); }
+
+/* ========== 优先级筛选 / Priority Filter ========== */
+.priority-filter {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.pfilter-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+}
+.pfilter-btn.active { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+.pfilter-btn[data-pf="q1"].active { border-color: rgba(255,64,129,0.4); color: #ff4081; }
+.pfilter-btn[data-pf="q2"].active { border-color: rgba(0,229,255,0.4); color: #00e5ff; }
+.pfilter-btn[data-pf="q3"].active { border-color: rgba(255,171,64,0.4); color: #ffab40; }
+.pfilter-btn[data-pf="q4"].active { border-color: rgba(122,128,168,0.4); color: #7a80a8; }
+
+/* ========== 桌面宽屏布局 / Desktop Wide Layout ========== */
+.header-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header-row-main {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.header-row-filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .header-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .filter-bar {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+    min-width: 240px;
+  }
+  .priority-filter { margin-bottom: 0; }
+  .tag-filter { margin-bottom: 0; }
+
+  .thought-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* ========== 标签选择器 / Tag Selector ========== */
+.tag-selector {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.tag-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+}
+.tag-btn.active {
+  color: var(--accent-cyan);
+  border-color: rgba(0, 229, 255, 0.5);
+  background: rgba(0, 229, 255, 0.08);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.1);
+}
+.tag-btn:hover {
+  color: var(--text-primary);
+  border-color: rgba(0, 229, 255, 0.3);
+}
+.tag-btn-add {
+  background: transparent;
+  border: 1px dashed rgba(0, 229, 255, 0.3);
+  color: var(--accent-cyan);
+  font-size: 0.85rem;
+  padding: 2px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+}
+.tag-btn-add:hover {
+  background: rgba(0, 229, 255, 0.08);
+  border-color: var(--accent-cyan);
+}
+.tag-add-input {
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  outline: none;
+  width: 80px;
+  font-family: var(--font-stack);
+}
+.tag-add-input::placeholder { color: var(--text-secondary); }
+
+#bottomBar .tag-add-input {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  width: 70px;
+}
+
+/* ========== 卡片标签 / Card Tag ========== */
+.card-tag {
+  font-size: 0.72rem;
+  padding: 2px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-left: 2px;
+  font-weight: 500;
+}
+.card-tag[data-card-tag="Team"]  { color: #ff4081; background: rgba(255,64,129,0.1); border: 1px solid rgba(255,64,129,0.2); }
+.card-tag[data-card-tag="AI"]    { color: #00e5ff; background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.2); }
+.card-tag[data-card-tag="Coding"]{ color: #ffab40; background: rgba(255,171,64,0.1); border: 1px solid rgba(255,171,64,0.2); }
+.card-tag[data-card-tag="Mine"]  { color: var(--accent-purple); background: rgba(179,136,255,0.08); border: 1px solid rgba(179,136,255,0.2); }
+.card-tag:hover {
+  filter: brightness(1.3);
+}
+
+/* ========== 卡片内浮窗选择器 / Card Popup Picker ========== */
+.card-popup {
+  position: fixed;
+  z-index: 9999;
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 12px rgba(0, 229, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 100px;
+  animation: popupAppear 150ms cubic-bezier(0.2, 0, 0, 1.5);
+}
+
+@keyframes popupAppear {
+  from { opacity: 0; transform: translateY(-4px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-popup-item {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  text-align: left;
+  transition: all 120ms ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-popup-item:hover {
+  background: rgba(0, 229, 255, 0.08);
+  color: var(--text-primary);
+}
+.card-popup-item.selected {
+  color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.06);
+}
+.card-popup-item .pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ========== 卡片标签头 / Card Tag Header ========== */
+.card-tag-header {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
+  display: none;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.thought-card[data-tag="Team"] .card-tag-header  { color: #ff4081; }
+.thought-card[data-tag="AI"] .card-tag-header    { color: #00e5ff; }
+.thought-card[data-tag="Coding"] .card-tag-header{ color: #ffab40; }
+.thought-card[data-tag="Mine"] .card-tag-header  { color: var(--accent-purple); }
+.thought-card.in-tag-view .card-tag-header { display: block; }
+
+/* ========== 视图切换 / View Toggle ========== */
+.view-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.view-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+}
+.view-btn.active {
+  background: rgba(0, 229, 255, 0.08);
+  color: var(--accent-cyan);
+}
+
+/* ========== 标签分组头部 / Tag Group Header ========== */
+.tag-group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0 8px;
+  margin-top: 12px;
+  break-inside: avoid;
+}
+.tag-group-header:first-child { margin-top: 0; padding-top: 4px; }
+.tag-group-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-purple);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+.tag-group-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(179, 136, 255, 0.3), transparent);
+}
+.tag-group-count {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: 1px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(179, 136, 255, 0.15);
+  white-space: nowrap;
+}
+
+/* ========== 标签筛选 / Tag Filter ========== */
+.tag-filter {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.tfilter-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-stack);
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.tfilter-btn.active {
+  color: var(--accent-purple);
+  border-color: rgba(179, 136, 255, 0.4);
+  background: rgba(179, 136, 255, 0.08);
+}
+.tfilter-count {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: 0 5px;
+  border-radius: 8px;
+}
+
+/* ========== 提醒徽章 / Reminder Badge ========== */
+.reminder-badge {
+  font-size: 0.68rem;
+  padding: 1px 8px;
+  border-radius: 10px;
+  color: var(--accent-cyan);
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  text-shadow: 0 0 6px rgba(0, 229, 255, 0.3);
+  animation: reminderPulse 3s ease-in-out infinite;
+}
+.reminder-badge:hover {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
+}
+
+@keyframes reminderPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ========== 提醒面板 / Reminder Panel ========== */
+.reminder-panel {
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 229, 255, 0.08);
+  min-width: 240px;
+  animation: popupAppear 150ms cubic-bezier(0.2, 0, 0, 1.5);
+}
+.reminder-panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.reminder-panel-row:last-child {
+  margin-bottom: 0;
+}
+.reminder-panel-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* ========== 提醒开关 / Reminder Toggle ========== */
+.reminder-toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.reminder-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.reminder-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  transition: all var(--transition);
+}
+.reminder-toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: all var(--transition);
+}
+.reminder-toggle input:checked + .reminder-toggle-slider {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.15);
+}
+.reminder-toggle input:checked + .reminder-toggle-slider::before {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.5);
+  transform: translateX(16px);
+}
+
+/* ========== 提醒日期选择器 / Reminder Datetime Input ========== */
+.reminder-datetime-input {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 229, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-stack);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  outline: none;
+  transition: border-color var(--transition);
+  width: 100%;
+  max-width: 160px;
+}
+.reminder-datetime-input:focus {
+  border-color: rgba(0, 229, 255, 0.4);
+  box-shadow: 0 0 6px rgba(0, 229, 255, 0.1);
+}
+::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(1) hue-rotate(150deg);
+}
+
+/* ========== 提醒重复选择 / Reminder Repeat Select ========== */
+.reminder-repeat-select {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(179, 136, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-stack);
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+.reminder-repeat-select:focus {
+  border-color: rgba(179, 136, 255, 0.4);
+  box-shadow: 0 0 6px rgba(179, 136, 255, 0.1);
+}
+
+/* ========== 提醒编辑器弹窗 / Reminder Editor Popup ========== */
+.reminder-editor-popup {
+  background: var(--bg-tertiary);
+  border-color: rgba(0, 229, 255, 0.2);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 229, 255, 0.08);
+}
+.reminder-editor-popup .reminder-datetime-input {
+  max-width: 100%;
+}
+
+/* ========== 提醒按钮激活态 / Reminder Button Active ========== */
+.reminder-active {
+  color: var(--accent-cyan) !important;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+</style>
+</head>
+<body>
+
+<!-- 欢迎屏幕 / Welcome Screen -->
+<div id="welcomeScreen" class="welcome-overlay" style="display:none;">
+  <div class="welcome-card">
+    <h2>闪念</h2>
+    <p>心有所念，落笔成篇。</p>
+<p>万事皆藏于本卷，不出户、不传外，唯君可鉴。</p>
+    <div class="welcome-actions">
+      <button id="btnCreateFile" class="btn-primary" type="button">落笔新卷</button>
+      <button id="btnOpenFile" class="btn-secondary" type="button">翻阅旧卷</button>
+    </div>
+  </div>
+</div>
+
+<!-- 主界面 / Main App -->
+<div id="mainApp" class="app-container" style="display:none;">
+  <header>
+    <div class="header-top">
+      <h1>闪念</h1>
+      <div class="file-status">
+        <span class="file-dot" id="fileDot"></span>
+        <span id="fileName">未开卷</span>
+        <button class="btn-change-file" id="btnChangeFile" type="button" title="切换数据文件">换卷</button>
+        <button class="btn-change-file" id="btnFontDown" type="button" title="缩小字体">A-</button>
+        <span id="fontSizeLabel" style="font-size:0.7rem;min-width:28px;text-align:center;">16</span>
+        <button class="btn-change-file" id="btnFontUp" type="button" title="放大字体">A+</button>
+      </div>
+    </div>
+
+    <!-- 过滤器 / Filters (compact, clear grouping) -->
+    <div class="header-filters">
+      <!-- Row 1: 状态筛选 + 搜索 + 视图切换 -->
+      <div class="header-row-main">
+        <div class="filter-bar" role="tablist">
+          <button class="filter-tab active" data-filter="all" role="tab" aria-selected="true" type="button">
+            全卷 <span class="filter-badge" id="badgeAll">0</span>
+          </button>
+          <button class="filter-tab" data-filter="pending" role="tab" aria-selected="false" type="button">
+            未了 <span class="filter-badge" id="badgePending">0</span>
+          </button>
+          <button class="filter-tab" data-filter="completed" role="tab" aria-selected="false" type="button">
+            已了 <span class="filter-badge" id="badgeCompleted">0</span>
+          </button>
+        </div>
+        <div class="search-area">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="searchInput" placeholder="翻阅旧念…" aria-label="搜索想法">
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active" data-view="list" type="button">列表</button>
+          <button class="view-btn" data-view="tags" type="button">标签</button>
+        </div>
+      </div>
+      <!-- Row 2: 优先级 + 标签筛选 -->
+      <div class="header-row-filters">
+        <span class="bottom-bar-label">优先</span>
+        <div class="priority-filter" role="group" aria-label="按优先级筛选">
+          <button class="pfilter-btn active" data-pf="all" type="button">全部</button>
+          <button class="pfilter-btn" data-pf="q1" type="button">急要</button>
+          <button class="pfilter-btn" data-pf="q2" type="button">重要</button>
+          <button class="pfilter-btn" data-pf="q3" type="button">紧急</button>
+          <button class="pfilter-btn" data-pf="q4" type="button">闲记</button>
+        </div>
+        <span class="bottom-bar-divider">│</span>
+        <span class="bottom-bar-label">标签</span>
+        <div class="tag-filter" id="tagFilter" role="group" aria-label="按标签筛选">
+          <button class="tfilter-btn active" data-tf="all" type="button">全部</button>
+          <button class="tfilter-btn" data-tf="Team" type="button">Team <span class="tfilter-count" data-tfc="Team">0</span></button>
+          <button class="tfilter-btn" data-tf="AI" type="button">AI <span class="tfilter-count" data-tfc="AI">0</span></button>
+          <button class="tfilter-btn" data-tf="Coding" type="button">Coding <span class="tfilter-count" data-tfc="Coding">0</span></button>
+          <button class="tfilter-btn" data-tf="Mine" type="button">Mine <span class="tfilter-count" data-tfc="Mine">0</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 想法列表 / Thought List -->
+  <main id="thoughtList" class="thought-list" role="list"></main>
+</div>
+
+<!-- 底部输入栏 / Bottom Input Bar -->
+<div id="bottomBar" style="display:none;">
+  <div class="bottom-bar-inner">
+    <!-- Row 1: Priority + Tags -->
+    <div class="bottom-bar-row">
+      <div class="priority-selector">
+        <span class="bottom-bar-label">优先</span>
+        <button class="priority-btn q1 active" data-priority="q1" type="button">急要</button>
+        <button class="priority-btn q2" data-priority="q2" type="button">重要</button>
+        <button class="priority-btn q3" data-priority="q3" type="button">紧急</button>
+        <button class="priority-btn q4" data-priority="q4" type="button">闲记</button>
+      </div>
+      <span class="bottom-bar-divider">│</span>
+      <div class="tag-selector" id="tagSelector">
+        <span class="bottom-bar-label">标签</span>
+        <button class="tag-btn active" data-tag="Team" type="button">Team</button>
+        <button class="tag-btn" data-tag="AI" type="button">AI</button>
+        <button class="tag-btn" data-tag="Coding" type="button">Coding</button>
+        <button class="tag-btn" data-tag="Mine" type="button">Mine</button>
+        <button class="tag-btn-add" id="btnAddTag" type="button">+</button>
+      </div>
+    </div>
+    <!-- Row 2: Textarea + Reminder button -->
+    <div class="bottom-input-row">
+      <textarea id="thoughtInput" placeholder="心有所念，落笔于此…" rows="1" aria-label="输入想法"></textarea>
+      <button class="btn-reminder" id="btnReminder" type="button" title="设提醒" onclick="window._toggleReminder(this, event)">🔔</button>
+    </div>
+    <!-- Row 3: Hint -->
+    <div class="bottom-input-hint">
+      <span>Enter 落笔 · Shift+Enter 另起一行</span>
+      <span id="charCount">0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Global handler for reminder button (must be outside IIFE for onclick attribute) */
+window._toggleReminder = null;
+/* ================================================================
+   闪念 — 本地想法记录工具
+   所有数据通过 Tauri v2 Plugin API 保存在本地 JSON 文件中
+   ================================================================ */
+
+(function() {
+  'use strict';
+
+  // ==================== 状态管理 / State ====================
+  const APP_STATE_KEY = 'flashmind_file_handle';
+
+  const { open: dialogOpen, save: dialogSave } = window.__TAURI__.dialog;
+  const { readTextFile, writeTextFile } = window.__TAURI__.fs;
+
+  let filePath = null;              // 文件路径
+  let thoughts = [];                // 想法数据
+  let currentFilter = 'all';        // 当前过滤器
+  let searchQuery = '';             // 搜索关键词
+  let currentPriority = 'q1';      // 当前输入优先级
+  let currentPriorityFilter = 'all'; // 当前优先级筛选
+  let currentTag = 'Mine';           // 当前输入标签
+  let currentTagFilter = 'all';      // 当前标签筛选
+  let customTags = [];               // 用户自定义标签
+  let currentView = 'list';          // 当前视图: 'list' | 'tags'
+  let currentReminder = { enabled: false, datetime: null, repeat: 'none' };
+  let reminderEngineInterval = null;
+
+  // ==================== 提醒引擎 / Reminder Engine ====================
+
+  const REMINDER_CHECK_INTERVAL = 30000; // 30 seconds
+
+  /** Request notification permission on startup */
+  async function requestNotificationPermission() {
+    try {
+      if (!window.__TAURI__ || !window.__TAURI__.notification) return false;
+      const notif = window.__TAURI__.notification;
+      let granted = await notif.isPermissionGranted();
+      if (!granted) {
+        const permission = await notif.requestPermission();
+        granted = permission === 'granted';
+      }
+      return granted;
+    } catch (e) {
+      console.warn('Notification permission error:', e);
+      return false;
+    }
+  }
+
+  /** Calculate next trigger datetime based on repeat pattern */
+  function calculateNextReminder(isoStr, repeat) {
+    const d = new Date(isoStr);
+    if (repeat === 'daily') {
+      d.setDate(d.getDate() + 1);
+    } else if (repeat === 'weekly') {
+      d.setDate(d.getDate() + 7);
+    } else if (repeat === 'monthly') {
+      d.setMonth(d.getMonth() + 1);
+    }
+    return d.toISOString();
+  }
+
+  /** Send a system notification (defensive) */
+  function sendSystemNotification(title, body) {
+    try {
+      if (window.__TAURI__ && window.__TAURI__.notification && window.__TAURI__.notification.sendNotification) {
+        window.__TAURI__.notification.sendNotification({ title: title, body: body });
+      }
+    } catch (e) {
+      console.warn('Failed to send notification:', e);
+    }
+  }
+
+  /** Main reminder check loop */
+  function checkReminders() {
+    const now = new Date();
+    let needsSave = false;
+
+    thoughts.forEach(t => {
+      if (!t.reminder || !t.reminder.enabled || !t.reminder.datetime) return;
+      if (t.completedAt) return; // skip completed thoughts
+
+      const triggerTime = new Date(t.reminder.datetime);
+      if (triggerTime <= now) {
+        // Fire notification
+        sendSystemNotification('闪念提醒', t.content);
+
+        if (t.reminder.repeat && t.reminder.repeat !== 'none') {
+          // Calculate next trigger, ensure it's in the future
+          let next = calculateNextReminder(t.reminder.datetime, t.reminder.repeat);
+          while (new Date(next) <= now) {
+            next = calculateNextReminder(next, t.reminder.repeat);
+          }
+          t.reminder.datetime = next;
+        } else {
+          t.reminder.enabled = false;
+        }
+        needsSave = true;
+      }
+    });
+
+    if (needsSave) {
+      saveData();
+      render();
+    }
+  }
+
+  /** Start the reminder engine */
+  function startReminderEngine() {
+    if (reminderEngineInterval) clearInterval(reminderEngineInterval);
+    requestNotificationPermission();
+    checkReminders(); // immediate first check
+    reminderEngineInterval = setInterval(checkReminders, REMINDER_CHECK_INTERVAL);
+  }
+
+  /** Format reminder datetime for display in cards */
+  function formatReminderDisplay(reminder) {
+    if (!reminder || !reminder.datetime) return '';
+    const d = new Date(reminder.datetime);
+    const mo = String(d.getMonth() + 1).padStart(2, '0');
+    const da = String(d.getDate()).padStart(2, '0');
+    const h = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    const repeatLabels = { none: '', daily: '每天', weekly: '每周', monthly: '每月' };
+    const prefix = repeatLabels[reminder.repeat || 'none'] || '';
+    if (prefix) return prefix + ' ' + h + ':' + mi;
+    return mo + '-' + da + ' ' + h + ':' + mi;
+  }
+
+  /** Show reminder editor popup for a specific thought */
+  function showReminderEditor(anchorEl, thought) {
+    closePopup();
+
+    const popup = document.createElement('div');
+    popup.className = 'card-popup reminder-editor-popup';
+    popup.style.minWidth = '220px';
+    popup.style.padding = '10px';
+
+    // Ensure reminder exists
+    if (!thought.reminder) {
+      thought.reminder = { enabled: false, datetime: null, repeat: 'none' };
+    }
+
+    // Header
+    const header = document.createElement('div');
+    header.style.cssText = 'font-size:0.8rem;color:var(--accent-cyan);margin-bottom:8px;font-weight:600;letter-spacing:0.05em;';
+    header.textContent = '⏰ 提醒设置';
+    popup.appendChild(header);
+
+    // Toggle row
+    const toggleRow = document.createElement('div');
+    toggleRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
+    const toggleLabel = document.createElement('span');
+    toggleLabel.style.cssText = 'font-size:0.78rem;color:var(--text-primary);';
+    toggleLabel.textContent = '开启提醒';
+    const toggleSwitch = document.createElement('label');
+    toggleSwitch.className = 'reminder-toggle';
+    const toggleInput = document.createElement('input');
+    toggleInput.type = 'checkbox';
+    toggleInput.checked = thought.reminder.enabled;
+    const toggleSlider = document.createElement('span');
+    toggleSlider.className = 'reminder-toggle-slider';
+    toggleSwitch.appendChild(toggleInput);
+    toggleSwitch.appendChild(toggleSlider);
+    toggleRow.appendChild(toggleLabel);
+    toggleRow.appendChild(toggleSwitch);
+    popup.appendChild(toggleRow);
+
+    // Datetime input
+    const dtRow = document.createElement('div');
+    dtRow.style.cssText = 'margin-bottom:8px;';
+    const dtInput = document.createElement('input');
+    dtInput.type = 'datetime-local';
+    dtInput.className = 'reminder-datetime-input';
+    if (thought.reminder.datetime) {
+      // Convert to local datetime-local format
+      const d = new Date(thought.reminder.datetime);
+      const localStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      dtInput.value = localStr;
+    }
+    dtRow.appendChild(dtInput);
+    popup.appendChild(dtRow);
+
+    // Repeat selector
+    const repeatRow = document.createElement('div');
+    repeatRow.style.cssText = 'margin-bottom:8px;';
+    const repeatSelect = document.createElement('select');
+    repeatSelect.className = 'reminder-repeat-select';
+    const repeatOptions = [
+      { value: 'none', label: '不重复' },
+      { value: 'daily', label: '每天' },
+      { value: 'weekly', label: '每周' },
+      { value: 'monthly', label: '每月' }
+    ];
+    repeatOptions.forEach(opt => {
+      const o = document.createElement('option');
+      o.value = opt.value;
+      o.textContent = opt.label;
+      if (thought.reminder.repeat === opt.value) o.selected = true;
+      repeatSelect.appendChild(o);
+    });
+    repeatRow.appendChild(repeatSelect);
+    popup.appendChild(repeatRow);
+
+    // Action buttons
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:6px;justify-content:flex-end;';
+
+    const btnRemove = document.createElement('button');
+    btnRemove.className = 'card-popup-item';
+    btnRemove.type = 'button';
+    btnRemove.textContent = '移除';
+    btnRemove.style.cssText = 'color:var(--danger);font-size:0.72rem;';
+    btnRemove.addEventListener('click', (e) => {
+      e.stopPropagation();
+      thought.reminder = { enabled: false, datetime: null, repeat: 'none' };
+      closePopup();
+      persistAndRender();
+    });
+
+    const btnSave = document.createElement('button');
+    btnSave.className = 'card-popup-item';
+    btnSave.type = 'button';
+    btnSave.textContent = '保存';
+    btnSave.style.cssText = 'color:var(--accent-cyan);font-size:0.72rem;font-weight:600;';
+    btnSave.addEventListener('click', (e) => {
+      e.stopPropagation();
+      thought.reminder.enabled = toggleInput.checked;
+      if (dtInput.value) {
+        thought.reminder.datetime = new Date(dtInput.value).toISOString();
+      } else {
+        thought.reminder.enabled = false;
+        thought.reminder.datetime = null;
+      }
+      thought.reminder.repeat = repeatSelect.value;
+      if (!thought.reminder.datetime) {
+        thought.reminder.enabled = false;
+      }
+      closePopup();
+      persistAndRender();
+    });
+
+    btnRow.appendChild(btnRemove);
+    btnRow.appendChild(btnSave);
+    popup.appendChild(btnRow);
+
+    // Position
+    document.body.appendChild(popup);
+    const anchorRect = anchorEl.getBoundingClientRect();
+    popup.style.position = 'fixed';
+    popup.style.top = (anchorRect.bottom + 4) + 'px';
+    popup.style.left = anchorRect.left + 'px';
+    popup.style.zIndex = '9999';
+
+    // Check right overflow
+    requestAnimationFrame(() => {
+      const popupRect = popup.getBoundingClientRect();
+      if (popupRect.right > window.innerWidth - 10) {
+        popup.style.left = 'auto';
+        popup.style.right = '10px';
+      }
+      // Check bottom overflow
+      if (popupRect.bottom > window.innerHeight - 10) {
+        popup.style.top = 'auto';
+        popup.style.bottom = '10px';
+      }
+    });
+
+    activePopup = popup;
+
+    // Close on click outside
+    const closeHandler = (e) => {
+      if (!popup.contains(e.target) && e.target !== anchorEl) {
+        closePopup();
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 10);
+  }
+
+  // ==================== 浮窗管理 / Popup Manager ====================
+  let activePopup = null;
+
+  function closePopup() {
+    if (activePopup) {
+      activePopup.remove();
+      activePopup = null;
+    }
+  }
+
+  function showPopup(anchorEl, items, onSelect) {
+    closePopup();
+    
+    const popup = document.createElement('div');
+    popup.className = 'card-popup';
+    
+    items.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'card-popup-item' + (item.selected ? ' selected' : '');
+      btn.type = 'button';
+      
+      if (item.pipColor) {
+        const pip = document.createElement('span');
+        pip.className = 'pip';
+        pip.style.background = item.pipColor;
+        btn.appendChild(pip);
+      }
+      
+      const label = document.createTextNode(item.label);
+      btn.appendChild(label);
+      
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        onSelect(item.value);
+        closePopup();
+      });
+      popup.appendChild(btn);
+    });
+    
+    // Append to body, position using viewport coords
+    document.body.appendChild(popup);
+    
+    const anchorRect = anchorEl.getBoundingClientRect();
+    popup.style.position = 'fixed';
+    popup.style.top = (anchorRect.bottom + 4) + 'px';
+    popup.style.left = anchorRect.left + 'px';
+    popup.style.zIndex = '9999';
+    
+    // Check right overflow
+    requestAnimationFrame(() => {
+      const popupRect = popup.getBoundingClientRect();
+      if (popupRect.right > window.innerWidth - 10) {
+        popup.style.left = 'auto';
+        popup.style.right = '10px';
+      }
+    });
+    
+    activePopup = popup;
+    
+    // Close on click outside
+    const closeHandler = (e) => {
+      if (!popup.contains(e.target) && e.target !== anchorEl) {
+        closePopup();
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 10);
+  }
+
+  // ==================== DOM 引用 / DOM Refs ====================
+  const $welcome     = document.getElementById('welcomeScreen');
+  const $mainApp     = document.getElementById('mainApp');
+  const $btnCreate   = document.getElementById('btnCreateFile');
+  const $btnOpen     = document.getElementById('btnOpenFile');
+  const $fileDot     = document.getElementById('fileDot');
+  const $fileName    = document.getElementById('fileName');
+  const $btnChange   = document.getElementById('btnChangeFile');
+  const $input       = document.getElementById('thoughtInput');
+  const $charCount   = document.getElementById('charCount');
+  const $searchInput = document.getElementById('searchInput');
+  const $thoughtList = document.getElementById('thoughtList');
+  const $badgeAll    = document.getElementById('badgeAll');
+  const $badgePending = document.getElementById('badgePending');
+  const $badgeCompleted = document.getElementById('badgeCompleted');
+
+  // ==================== 初始化 / Init ====================
+  async function init() {
+    const savedPath = localStorage.getItem(APP_STATE_KEY);
+    if (savedPath) {
+      try {
+        filePath = savedPath;
+        await loadFromFile();
+        showMainApp();
+        return;
+      } catch (e) {
+        console.warn('Failed to load saved file:', e);
+        filePath = null;
+      }
+    }
+    $welcome.style.display = 'flex';
+  }
+
+  // ==================== 文件操作 / File Operations ====================
+
+  /** 创建新文件 */
+  async function createNewFile() {
+    try {
+      const selected = await dialogSave({
+        defaultPath: '我的想法.json',
+        filters: [{ name: 'JSON 数据文件', extensions: ['json'] }]
+      });
+      if (!selected) return;
+      filePath = selected;
+      const initData = { version: 1, thoughts: [], customTags: [] };
+      await writeTextFile(filePath, JSON.stringify(initData, null, 2));
+      localStorage.setItem(APP_STATE_KEY, filePath);
+      thoughts = [];
+      showMainApp();
+    } catch (e) {
+      console.error('Failed to create file:', e);
+    }
+  }
+
+  /** 打开已有文件 */
+  async function openExistingFile() {
+    try {
+      const selected = await dialogOpen({
+        multiple: false,
+        filters: [{ name: 'JSON 数据文件', extensions: ['json'] }]
+      });
+      if (!selected) return;
+      filePath = selected;
+      localStorage.setItem(APP_STATE_KEY, filePath);
+      await loadFromFile();
+      showMainApp();
+    } catch (e) {
+      console.error('Failed to open file:', e);
+    }
+  }
+
+  /** 从文件加载数据 */
+  async function loadFromFile() {
+    try {
+      const text = await readTextFile(filePath);
+      const data = JSON.parse(text);
+      thoughts = data.thoughts || [];
+      customTags = data.customTags || [];
+      // Backward compat: ensure reminder field on every thought
+      thoughts.forEach(t => {
+        if (!t.reminder) {
+          t.reminder = { enabled: false, datetime: null, repeat: 'none' };
+        }
+      });
+      const name = filePath.split('/').pop() || filePath.split('\\').pop() || filePath;
+      updateFileStatus(name);
+    } catch (e) {
+      console.error('Failed to read file:', e);
+      thoughts = [];
+    }
+  }
+
+  /** 写入文件 */
+  async function writeToFile(data) {
+    await writeTextFile(filePath, JSON.stringify(data, null, 2));
+  }
+
+  async function saveData() {
+    if (!filePath) return;
+    try {
+      await writeToFile({ version: 1, thoughts: thoughts, customTags: customTags });
+    } catch (e) {
+      console.error('保存失败:', e);
+    }
+  }
+
+  // ==================== 界面切换 / UI Switching ====================
+
+  function showMainApp() {
+    $welcome.style.display = 'none';
+    $mainApp.style.display = 'block';
+    document.getElementById('bottomBar').style.display = 'block';
+    renderTagSelector();
+    setupReminderButton();
+    startReminderEngine();
+    render();
+    $input.focus();
+  }
+
+  function updateFileStatus(name) {
+    $fileName.textContent = name || '未开卷';
+    $fileDot.classList.toggle('connected', !!name);
+  }
+
+  // ==================== 想法操作 / Thought Operations ====================
+
+  function addThought(content) {
+    const trimmed = content.trim();
+    if (!trimmed) return;
+
+    const thought = {
+      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2),
+      content: trimmed,
+      createdAt: new Date().toISOString(),
+      completedAt: null,
+      priority: currentPriority,
+      tag: currentTag,
+      reminder: { enabled: currentReminder.enabled, datetime: currentReminder.datetime, repeat: currentReminder.repeat }
+    };
+
+    thoughts.unshift(thought);
+
+    // Reset reminder state after adding
+    currentReminder = { enabled: false, datetime: null, repeat: 'none' };
+    // Also reset UI if reminder panel is open
+    const reminderToggle = document.getElementById('reminderToggle');
+    if (reminderToggle) reminderToggle.checked = false;
+    const reminderDatetime = document.getElementById('reminderDatetime');
+    if (reminderDatetime) reminderDatetime.value = '';
+    const reminderRepeat = document.getElementById('reminderRepeat');
+    if (reminderRepeat) reminderRepeat.value = 'none';
+    // Update button visual state
+    const reminderBtn = document.getElementById('btnReminder');
+    if (reminderBtn) reminderBtn.classList.remove('reminder-active');
+
+    persistAndRender();
+
+    // 成功动画
+    setTimeout(() => {
+      const firstCard = $thoughtList.querySelector('.thought-card');
+      if (firstCard) firstCard.classList.add('success-flash');
+    }, 50);
+  }
+
+  function toggleThought(id) {
+    const t = thoughts.find(x => x.id === id);
+    if (!t) return;
+    t.completedAt = t.completedAt ? null : new Date().toISOString();
+    persistAndRender();
+  }
+
+  function deleteThought(id) {
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if (card) {
+      // 先播放删除动画
+      card.style.animation = 'none';
+      void card.offsetHeight; // 强制回流，清除旧动画状态
+      card.style.animation = '';
+      card.classList.add('removing');
+      setTimeout(() => {
+        thoughts = thoughts.filter(x => x.id !== id);
+        persistAndRender();
+      }, 260);
+    } else {
+      thoughts = thoughts.filter(x => x.id !== id);
+      persistAndRender();
+    }
+  }
+
+  function persistAndRender() {
+    saveData();
+    render();
+  }
+
+  // ==================== 渲染 / Rendering ====================
+
+  function render() {
+    const filtered = getFilteredThoughts();
+    const pendingCount = thoughts.filter(t => !t.completedAt).length;
+    const completedCount = thoughts.filter(t => t.completedAt).length;
+
+    // 更新计数
+    $badgeAll.textContent = thoughts.length;
+    $badgePending.textContent = pendingCount;
+    $badgeCompleted.textContent = completedCount;
+
+    // 更新标签筛选器计数
+    renderTagFilter();
+
+    // 按视图渲染
+    if (currentView === 'tags') {
+      renderTagView();
+      return;
+    }
+
+    // 渲染列表
+    $thoughtList.innerHTML = '';
+
+    if (filtered.length === 0) {
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'empty-state';
+      if (thoughts.length === 0) {
+        emptyEl.innerHTML = '';
+        const icon = document.createElement('span');
+        icon.className = 'empty-icon-cyber';
+        icon.textContent = '⟨ ⟩';
+        const text = document.createElement('div');
+        text.className = 'empty-text';
+        text.textContent = '落笔写下你的第一个念头';
+        emptyEl.appendChild(icon);
+        emptyEl.appendChild(text);
+      } else {
+        const text = document.createElement('div');
+        text.className = 'empty-text';
+        text.textContent = '翻遍全卷，未见此言';
+        emptyEl.appendChild(text);
+      }
+      $thoughtList.appendChild(emptyEl);
+      return;
+    }
+
+    filtered.forEach((thought, index) => {
+      const card = createCardElement(thought, index);
+      $thoughtList.appendChild(card);
+    });
+  }
+
+  function createCardElement(thought, index) {
+    const priority = thought.priority || 'q1';
+    const priorityLabels = { q1: '急要', q2: '重要', q3: '紧急', q4: '闲记' };
+
+    const card = document.createElement('article');
+    card.className = 'thought-card' + (thought.completedAt ? ' completed' : '');
+    card.dataset.id = thought.id;
+    card.dataset.priority = priority;
+    card.dataset.tag = thought.tag || 'Mine';
+    card.setAttribute('role', 'listitem');
+    card.style.animationDelay = Math.min(index * 30, 300) + 'ms';
+
+    // Card tag header (small, subtle)
+    const cardTagHeader = document.createElement('div');
+    cardTagHeader.className = 'card-tag-header';
+    cardTagHeader.textContent = thought.tag || 'Mine';
+    card.appendChild(cardTagHeader);
+
+    // 内容区
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'card-content';
+
+    // 勾选按钮
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'btn-toggle' + (thought.completedAt ? ' checked' : '');
+    toggleBtn.type = 'button';
+    toggleBtn.setAttribute('aria-label', thought.completedAt ? '标记为未了' : '标记为了结');
+    const checkIcon = document.createElement('span');
+    checkIcon.className = 'check-icon';
+    checkIcon.textContent = '✓';
+    toggleBtn.appendChild(checkIcon);
+    toggleBtn.addEventListener('click', () => toggleThought(thought.id));
+
+    // 文本区
+    const bodyDiv = document.createElement('div');
+    bodyDiv.className = 'card-body';
+    const textP = document.createElement('div');
+    textP.className = 'card-text';
+    textP.textContent = thought.content; // XSS safe: textContent
+
+    // 元信息
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'card-meta';
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'card-time';
+    timeSpan.textContent = formatRelativeTime(thought.createdAt);
+
+    // 优先级标签（可点击切换）
+    const priorityTag = document.createElement('span');
+    priorityTag.className = 'priority-tag ' + priority;
+    priorityTag.textContent = priorityLabels[priority];
+    priorityTag.title = '点击切换优先级';
+    priorityTag.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = thought.priority || 'q1';
+      const priorityConfig = {
+        q1: { label: '急要', color: '#ff4081' },
+        q2: { label: '重要', color: '#00e5ff' },
+        q3: { label: '紧急', color: '#ffab40' },
+        q4: { label: '闲记', color: '#7a80a8' }
+      };
+      const items = ['q1', 'q2', 'q3', 'q4'].map(key => ({
+        value: key,
+        label: priorityConfig[key].label,
+        pipColor: priorityConfig[key].color,
+        selected: key === current
+      }));
+      showPopup(priorityTag, items, (val) => {
+        thought.priority = val;
+        persistAndRender();
+      });
+    });
+
+    // 标签标签（可点击切换）
+    const tagLabel = document.createElement('span');
+    tagLabel.className = 'card-tag';
+    tagLabel.dataset.cardTag = thought.tag || 'Mine';
+    tagLabel.textContent = thought.tag || 'Mine';
+    tagLabel.title = '点击切换标签';
+    tagLabel.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = thought.tag || 'Mine';
+      const items = getAllTags().map(tag => ({
+        value: tag,
+        label: tag,
+        selected: tag === current
+      }));
+      showPopup(tagLabel, items, (val) => {
+        thought.tag = val;
+        persistAndRender();
+      });
+    });
+
+    // 删除区域
+    const actionsDiv = document.createElement('div');
+    actionsDiv.style.display = 'flex';
+    actionsDiv.style.alignItems = 'center';
+    actionsDiv.style.gap = '4px';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-edit';
+    editBtn.type = 'button';
+    editBtn.textContent = '✎';
+    editBtn.setAttribute('aria-label', '编辑此念');
+
+    editBtn.addEventListener('click', () => {
+      const textarea = document.createElement('textarea');
+      textarea.className = 'card-edit-area';
+      textarea.value = thought.content;
+      textarea.rows = 1;
+
+      const editActions = document.createElement('div');
+      editActions.className = 'card-edit-actions';
+      const editIndicator = document.createElement('span');
+      editIndicator.className = 'card-edit-indicator';
+      editIndicator.textContent = 'EDITING';
+      const btnSave = document.createElement('button');
+      btnSave.className = 'btn-save-edit';
+      btnSave.type = 'button';
+      btnSave.textContent = '保存';
+      const btnCancel = document.createElement('button');
+      btnCancel.className = 'btn-cancel-edit';
+      btnCancel.type = 'button';
+      btnCancel.textContent = '取消';
+      editActions.appendChild(editIndicator);
+      editActions.appendChild(btnCancel);
+      editActions.appendChild(btnSave);
+
+      textP.style.display = 'none';
+      metaDiv.style.display = 'none';
+      absTime.style.display = 'none';
+      bodyDiv.appendChild(textarea);
+      bodyDiv.appendChild(editActions);
+      textarea.focus();
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.max(textarea.scrollHeight, 40) + 'px';
+      textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.max(textarea.scrollHeight, 40) + 'px';
+      });
+
+      function restoreEdit() {
+        textarea.remove();
+        editActions.remove();
+        textP.style.display = '';
+        metaDiv.style.display = '';
+        absTime.style.display = '';
+      }
+
+      btnSave.addEventListener('click', () => {
+        const newContent = textarea.value.trim();
+        if (!newContent) {
+          restoreEdit();
+          return;
+        }
+        thought.content = newContent;
+        persistAndRender();
+      });
+
+      btnCancel.addEventListener('click', restoreEdit);
+
+      textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          btnSave.click();
+        } else if (e.key === 'Escape') {
+          btnCancel.click();
+        }
+      });
+    });
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn-delete';
+    deleteBtn.type = 'button';
+    deleteBtn.textContent = '抹去';
+    deleteBtn.setAttribute('aria-label', '抹去此念');
+
+    // 行内确认
+    const confirmDiv = document.createElement('div');
+    confirmDiv.className = 'delete-confirm';
+    const confirmText = document.createElement('span');
+    confirmText.textContent = '当真?';
+    const btnYes = document.createElement('button');
+    btnYes.className = 'btn-confirm-yes';
+    btnYes.type = 'button';
+    btnYes.textContent = '然';
+    const btnNo = document.createElement('button');
+    btnNo.className = 'btn-confirm-no';
+    btnNo.type = 'button';
+    btnNo.textContent = '且慢';
+
+    confirmDiv.appendChild(confirmText);
+    confirmDiv.appendChild(btnYes);
+    confirmDiv.appendChild(btnNo);
+
+    deleteBtn.addEventListener('click', () => {
+      deleteBtn.style.display = 'none';
+      confirmDiv.classList.add('visible');
+    });
+
+    btnYes.addEventListener('click', () => deleteThought(thought.id));
+    btnNo.addEventListener('click', () => {
+      confirmDiv.classList.remove('visible');
+      deleteBtn.style.display = '';
+    });
+
+    actionsDiv.appendChild(editBtn);
+    actionsDiv.appendChild(deleteBtn);
+    actionsDiv.appendChild(confirmDiv);
+
+    // 左侧: 时间 + 优先级标签
+    const metaLeft = document.createElement('div');
+    metaLeft.style.display = 'flex';
+    metaLeft.style.alignItems = 'center';
+    metaLeft.style.gap = '6px';
+    metaLeft.appendChild(timeSpan);
+    metaLeft.appendChild(priorityTag);
+    metaLeft.appendChild(tagLabel);
+
+    // Reminder badge (if reminder enabled)
+    if (thought.reminder && thought.reminder.enabled && thought.reminder.datetime) {
+      const reminderBadge = document.createElement('span');
+      reminderBadge.className = 'reminder-badge';
+      reminderBadge.textContent = '⏰ ' + formatReminderDisplay(thought.reminder);
+      reminderBadge.title = '点击编辑提醒';
+      reminderBadge.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showReminderEditor(reminderBadge, thought);
+      });
+      metaLeft.appendChild(reminderBadge);
+    }
+
+    metaDiv.appendChild(metaLeft);
+    metaDiv.appendChild(actionsDiv);
+
+    bodyDiv.appendChild(textP);
+    bodyDiv.appendChild(metaDiv);
+
+    // 绝对创建时间（右下角）
+    const absTime = document.createElement('div');
+    absTime.className = 'card-abs-time';
+    absTime.textContent = formatAbsoluteTime(thought.createdAt);
+    bodyDiv.appendChild(absTime);
+
+    contentDiv.appendChild(toggleBtn);
+    contentDiv.appendChild(bodyDiv);
+
+    card.appendChild(contentDiv);
+    return card;
+  }
+
+  // ==================== 过滤 / Filtering ====================
+
+  function getFilteredThoughts() {
+    let result = thoughts;
+
+    // 按过滤条件
+    if (currentFilter === 'pending') {
+      result = result.filter(t => !t.completedAt);
+    } else if (currentFilter === 'completed') {
+      result = result.filter(t => t.completedAt);
+    }
+
+    // 按优先级筛选
+    if (currentPriorityFilter !== 'all') {
+      result = result.filter(t => (t.priority || 'q1') === currentPriorityFilter);
+    }
+
+    // 按标签筛选
+    if (currentTagFilter !== 'all') {
+      result = result.filter(t => (t.tag || 'Mine') === currentTagFilter);
+    }
+
+    // 按搜索
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(t => t.content.toLowerCase().includes(q));
+    }
+
+    return result;
+  }
+
+  // ==================== 标签辅助 / Tag Helpers ====================
+
+  function getAllTags() {
+    return [].concat(['Team', 'AI', 'Coding', 'Mine'], customTags);
+  }
+
+  function renderTagSelector() {
+    const container = document.getElementById('tagSelector');
+    if (!container) return;
+    container.querySelectorAll('.tag-btn').forEach(b => b.remove());
+    const addBtn = document.getElementById('btnAddTag');
+    getAllTags().forEach(tag => {
+      const btn = document.createElement('button');
+      btn.className = 'tag-btn' + (tag === currentTag ? ' active' : '');
+      btn.dataset.tag = tag;
+      btn.type = 'button';
+      btn.textContent = tag;
+      btn.addEventListener('click', () => {
+        currentTag = tag;
+        container.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+      container.insertBefore(btn, addBtn);
+    });
+  }
+
+  function renderTagFilter() {
+    const container = document.getElementById('tagFilter');
+    if (!container) return;
+    container.innerHTML = '';
+
+    // "全部" button
+    const allBtn = document.createElement('button');
+    allBtn.className = 'tfilter-btn' + (currentTagFilter === 'all' ? ' active' : '');
+    allBtn.dataset.tf = 'all';
+    allBtn.type = 'button';
+    allBtn.textContent = '全部';
+    allBtn.addEventListener('click', () => {
+      currentTagFilter = 'all';
+      renderTagFilter();
+      render();
+    });
+    container.appendChild(allBtn);
+
+    // Per-tag buttons with counts
+    getAllTags().forEach(tag => {
+      const count = thoughts.filter(t => (t.tag || 'Mine') === tag).length;
+      const btn = document.createElement('button');
+      btn.className = 'tfilter-btn' + (currentTagFilter === tag ? ' active' : '');
+      btn.dataset.tf = tag;
+      btn.type = 'button';
+
+      const nameSpan = document.createTextNode(tag + ' ');
+      btn.appendChild(nameSpan);
+
+      const countSpan = document.createElement('span');
+      countSpan.className = 'tfilter-count';
+      countSpan.dataset.tfc = tag;
+      countSpan.textContent = count;
+      btn.appendChild(countSpan);
+
+      btn.addEventListener('click', () => {
+        currentTagFilter = tag;
+        renderTagFilter();
+        render();
+      });
+      container.appendChild(btn);
+    });
+  }
+
+  function setupAddTagInline() {
+    const addBtn = document.getElementById('btnAddTag');
+    if (!addBtn) return;
+
+    addBtn.addEventListener('click', () => {
+      const container = document.getElementById('tagSelector');
+      if (!container) return;
+
+      // Replace + button with input
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'tag-add-input';
+      input.placeholder = '标签名…';
+      container.replaceChild(input, addBtn);
+      input.focus();
+
+      const restore = () => {
+        if (input.parentNode) {
+          container.replaceChild(addBtn, input);
+        }
+      };
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const name = input.value.trim();
+          if (name && !getAllTags().includes(name)) {
+            customTags.push(name);
+            currentTag = name;
+            persistAndRender();
+            renderTagSelector();
+            restore();
+          } else {
+            restore();
+          }
+        } else if (e.key === 'Escape') {
+          restore();
+        }
+      });
+
+      input.addEventListener('blur', restore);
+    });
+  }
+
+  // ==================== 标签视图渲染 / Tag View ====================
+
+  function renderTagView() {
+    $thoughtList.innerHTML = '';
+    const allTags = getAllTags();
+    const filtered = getFilteredThoughts();
+
+    // Group by tag
+    const groups = {};
+    allTags.forEach(tag => { groups[tag] = []; });
+    filtered.forEach(t => {
+      const tag = t.tag || 'Mine';
+      if (!groups[tag]) groups[tag] = [];
+      groups[tag].push(t);
+    });
+
+    // Render each group that has items
+    let hasItems = false;
+    allTags.forEach(tag => {
+      const items = groups[tag] || [];
+      if (items.length === 0) return;
+      hasItems = true;
+
+      // Group header
+      const header = document.createElement('div');
+      header.className = 'tag-group-header';
+      const tagName = document.createElement('span');
+      tagName.className = 'tag-group-name';
+      tagName.textContent = tag;
+      const line = document.createElement('span');
+      line.className = 'tag-group-line';
+      const tagCount = document.createElement('span');
+      tagCount.className = 'tag-group-count';
+      tagCount.textContent = items.length;
+      header.appendChild(tagName);
+      header.appendChild(line);
+      header.appendChild(tagCount);
+      $thoughtList.appendChild(header);
+
+      // Cards in this group
+      items.forEach((thought, idx) => {
+        const card = createCardElement(thought, idx);
+        card.classList.add('in-tag-view');
+        $thoughtList.appendChild(card);
+      });
+    });
+
+    if (!hasItems) {
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'empty-state';
+      const text = document.createElement('div');
+      text.className = 'empty-text';
+      text.textContent = thoughts.length === 0 ? '落笔写下你的第一个念头' : '翻遍全卷，未见此言';
+      emptyEl.appendChild(text);
+      $thoughtList.appendChild(emptyEl);
+    }
+  }
+
+  // ==================== 时间格式化 / Time Formatting ====================
+
+  function formatRelativeTime(isoStr) {
+    const date = new Date(isoStr);
+    const now = new Date();
+    const diff = now - date;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (seconds < 60) return '刚刚';
+    if (minutes < 60) return minutes + '分钟前';
+    if (hours < 24) return hours + '小时前';
+    if (days < 7) return days + '天前';
+
+    // 超过7天显示日期
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const currentYear = now.getFullYear();
+    return y === currentYear ? `${m}-${d}` : `${y}-${m}-${d}`;
+  }
+
+  /** 格式化绝对时间 */
+  function formatAbsoluteTime(isoStr) {
+    const d = new Date(isoStr);
+    const y = d.getFullYear();
+    const mo = String(d.getMonth() + 1).padStart(2, '0');
+    const da = String(d.getDate()).padStart(2, '0');
+    const h = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    const now = new Date();
+    const prefix = y === now.getFullYear() ? '' : y + '-';
+    return prefix + mo + '-' + da + ' ' + h + ':' + mi;
+  }
+
+  // ==================== 自动增长文本框 / Auto-resize Textarea ====================
+
+  function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 4.5 * 24) + 'px'; // ~3行
+  }
+
+  // ==================== 事件绑定 / Event Binding ====================
+
+  // 欢迎页按钮
+  $btnCreate.addEventListener('click', createNewFile);
+  $btnOpen.addEventListener('click', openExistingFile);
+
+  // 切换文件
+  $btnChange.addEventListener('click', async () => {
+    await openExistingFile();
+  });
+
+  // 输入框
+  $input.addEventListener('input', () => {
+    autoResize($input);
+    $charCount.textContent = $input.value.length;
+  });
+
+  $input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const val = $input.value.trim();
+      if (val) {
+        addThought(val);
+        $input.value = '';
+        $charCount.textContent = '0';
+        autoResize($input);
+      }
+    }
+  });
+
+  // 过滤器切换
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      currentFilter = tab.dataset.filter;
+      render();
+    });
+  });
+
+  // 优先级选择器切换（输入区）
+  document.querySelectorAll('.priority-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPriority = btn.dataset.priority;
+    });
+  });
+
+  // 优先级筛选切换
+  document.querySelectorAll('.pfilter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pfilter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPriorityFilter = btn.dataset.pf;
+      render();
+    });
+  });
+
+  // 视图切换
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      render();
+    });
+  });
+
+  // 标签选择器事件（输入区）
+  document.querySelectorAll('#tagSelector .tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentTag = btn.dataset.tag;
+      document.querySelectorAll('#tagSelector .tag-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // 添加自定义标签 inline UI
+  setupAddTagInline();
+
+  // 搜索
+  $searchInput.addEventListener('input', () => {
+    searchQuery = $searchInput.value.trim();
+    render();
+  });
+
+  // ==================== 提醒按钮 / Reminder Button ====================
+
+  let reminderPanelVisible = false;
+
+  function setupReminderButton() {
+    const reminderBtn = document.getElementById('btnReminder');
+    if (!reminderBtn) {
+      // Layout agent hasn't added it yet; retry once after delay
+      setTimeout(() => {
+        const btn = document.getElementById('btnReminder');
+        if (btn) attachReminderHandler(btn);
+      }, 2000);
+      return;
+    }
+    attachReminderHandler(reminderBtn);
+  }
+
+  function attachReminderHandler(btn) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleReminderPanel(btn);
+    });
+  }
+
+  function toggleReminderPanel(anchorEl) {
+    const existing = document.getElementById('reminderPanel');
+    if (existing) {
+      existing.remove();
+      reminderPanelVisible = false;
+      return;
+    }
+    reminderPanelVisible = true;
+
+    const panel = document.createElement('div');
+    panel.id = 'reminderPanel';
+    panel.className = 'reminder-panel';
+
+    // Header
+    const header = document.createElement('div');
+    header.style.cssText = 'font-size:0.8rem;color:var(--accent-cyan);margin-bottom:10px;font-weight:600;letter-spacing:0.05em;';
+    header.textContent = '⏰ 设提醒';
+    panel.appendChild(header);
+
+    // Toggle row
+    const toggleRow = document.createElement('div');
+    toggleRow.className = 'reminder-panel-row';
+    const toggleLabel = document.createElement('span');
+    toggleLabel.className = 'reminder-panel-label';
+    toggleLabel.textContent = '开启提醒';
+    const toggleSwitch = document.createElement('label');
+    toggleSwitch.className = 'reminder-toggle';
+    const toggleInput = document.createElement('input');
+    toggleInput.id = 'reminderToggle';
+    toggleInput.type = 'checkbox';
+    toggleInput.checked = currentReminder.enabled;
+    const toggleSlider = document.createElement('span');
+    toggleSlider.className = 'reminder-toggle-slider';
+    toggleSwitch.appendChild(toggleInput);
+    toggleSwitch.appendChild(toggleSlider);
+    toggleRow.appendChild(toggleLabel);
+    toggleRow.appendChild(toggleSwitch);
+    panel.appendChild(toggleRow);
+
+    // Datetime
+    const dtRow = document.createElement('div');
+    dtRow.className = 'reminder-panel-row';
+    const dtLabel = document.createElement('span');
+    dtLabel.className = 'reminder-panel-label';
+    dtLabel.textContent = '提醒时间';
+    const dtInput = document.createElement('input');
+    dtInput.id = 'reminderDatetime';
+    dtInput.type = 'datetime-local';
+    dtInput.className = 'reminder-datetime-input';
+    if (currentReminder.datetime) {
+      const d = new Date(currentReminder.datetime);
+      const localStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      dtInput.value = localStr;
+    }
+    dtRow.appendChild(dtLabel);
+    dtRow.appendChild(dtInput);
+    panel.appendChild(dtRow);
+
+    // Repeat
+    const repeatRow = document.createElement('div');
+    repeatRow.className = 'reminder-panel-row';
+    const repeatLabel = document.createElement('span');
+    repeatLabel.className = 'reminder-panel-label';
+    repeatLabel.textContent = '重复';
+    const repeatSelect = document.createElement('select');
+    repeatSelect.id = 'reminderRepeat';
+    repeatSelect.className = 'reminder-repeat-select';
+    const repeatOptions = [
+      { value: 'none', label: '无' },
+      { value: 'daily', label: '每天' },
+      { value: 'weekly', label: '每周' },
+      { value: 'monthly', label: '每月' }
+    ];
+    repeatOptions.forEach(opt => {
+      const o = document.createElement('option');
+      o.value = opt.value;
+      o.textContent = opt.label;
+      if (currentReminder.repeat === opt.value) o.selected = true;
+      repeatSelect.appendChild(o);
+    });
+    repeatRow.appendChild(repeatLabel);
+    repeatRow.appendChild(repeatSelect);
+    panel.appendChild(repeatRow);
+
+    // Wire live updates
+    toggleInput.addEventListener('change', () => {
+      currentReminder.enabled = toggleInput.checked;
+      updateReminderBtnState(anchorEl);
+    });
+    dtInput.addEventListener('change', () => {
+      if (dtInput.value) {
+        currentReminder.datetime = new Date(dtInput.value).toISOString();
+        if (!toggleInput.checked) {
+          toggleInput.checked = true;
+          currentReminder.enabled = true;
+        }
+      } else {
+        currentReminder.datetime = null;
+      }
+      updateReminderBtnState(anchorEl);
+    });
+    repeatSelect.addEventListener('change', () => {
+      currentReminder.repeat = repeatSelect.value;
+    });
+
+    // Position below anchor
+    document.body.appendChild(panel);
+    const anchorRect = anchorEl.getBoundingClientRect();
+    panel.style.position = 'fixed';
+    panel.style.bottom = (window.innerHeight - anchorRect.top + 6) + 'px';
+    panel.style.left = anchorRect.left + 'px';
+    panel.style.zIndex = '9998';
+
+    requestAnimationFrame(() => {
+      const panelRect = panel.getBoundingClientRect();
+      if (panelRect.right > window.innerWidth - 10) {
+        panel.style.left = 'auto';
+        panel.style.right = '10px';
+      }
+    });
+
+    // Close on click outside
+    const closeHandler = (e) => {
+      if (!panel.contains(e.target) && e.target !== anchorEl) {
+        panel.remove();
+        reminderPanelVisible = false;
+        document.removeEventListener('click', closeHandler);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', closeHandler), 10);
+  }
+
+  window._toggleReminder = function(el, e) {
+    if (e) e.stopPropagation();
+    toggleReminderPanel(el);
+  };
+
+  function updateReminderBtnState(btn) {
+    if (currentReminder.enabled && currentReminder.datetime) {
+      btn.classList.add('reminder-active');
+    } else {
+      btn.classList.remove('reminder-active');
+    }
+  }
+
+  // ==================== 字体大小 / Font Size ====================
+  const FONT_SIZE_KEY = 'flashmind_font_size';
+  const FONT_MIN = 13, FONT_MAX = 22;
+  let uiFontSize = parseInt(localStorage.getItem(FONT_SIZE_KEY)) || 16;
+
+  function applyFontSize() {
+    document.documentElement.style.setProperty('--ui-font-size', uiFontSize + 'px');
+    const label = document.getElementById('fontSizeLabel');
+    if (label) label.textContent = uiFontSize;
+  }
+
+  document.getElementById('btnFontDown').addEventListener('click', () => {
+    if (uiFontSize > FONT_MIN) { uiFontSize--; applyFontSize(); localStorage.setItem(FONT_SIZE_KEY, uiFontSize); }
+  });
+  document.getElementById('btnFontUp').addEventListener('click', () => {
+    if (uiFontSize < FONT_MAX) { uiFontSize++; applyFontSize(); localStorage.setItem(FONT_SIZE_KEY, uiFontSize); }
+  });
+
+  applyFontSize();
+
+  // ==================== 启动 / Boot ====================
+  init();
+
+})();
+</script>
+</body>
+</html>
