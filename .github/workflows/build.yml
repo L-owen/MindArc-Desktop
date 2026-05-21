@@ -46,7 +46,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
-      - name: Copy index.html to dist
+- name: Copy index.html to dist
         run: mkdir -p dist && cp index.html dist/index.html
         shell: bash
 
