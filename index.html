@@ -33,6 +33,19 @@
   --ui-font-size: 16px;
 }
 
+/* ========== 浅色主题 / Light Theme ========== */
+[data-theme="light"] {
+  --bg-primary: #f0f2f8;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e4e7f0;
+  --text-primary: #1a1a3e;
+  --text-secondary: #5a6080;
+  --border-subtle: rgba(80, 100, 160, 0.12);
+  --shadow-card: 0 2px 8px rgba(30, 40, 80, 0.08), 0 0 1px rgba(30, 40, 80, 0.12);
+  --glow-cyan: 0 0 16px rgba(0, 180, 220, 0.08);
+  --glow-purple: 0 0 16px rgba(140, 100, 220, 0.08);
+}
+
 html { font-size: var(--ui-font-size); }
 
 /* ========== 重置与基础 / Reset & Base ========== */
@@ -1461,6 +1474,351 @@ header::before {
   color: var(--accent-cyan) !important;
   text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
 }
+
+/* ========== 浅色主题覆盖 / Light Theme Overrides ========== */
+[data-theme="light"] body {
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 229, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(179, 136, 255, 0.04) 0%, transparent 50%);
+}
+
+/* Scrollbar */
+[data-theme="light"] ::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: #b8bdd0; border-radius: 3px; }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+/* Header glow */
+[data-theme="light"] header::before {
+  background: radial-gradient(ellipse, rgba(0, 180, 220, 0.08) 0%, rgba(68, 138, 255, 0.04) 40%, transparent 70%);
+}
+
+/* File dot */
+[data-theme="light"] .file-dot.connected {
+  box-shadow: 0 0 6px rgba(0, 200, 240, 0.4);
+}
+
+/* Bottom bar - frosted white glass */
+[data-theme="light"] #bottomBar {
+  background: rgba(240, 242, 248, 0.88);
+  border-top: 1px solid rgba(80, 100, 160, 0.12);
+  box-shadow: 0 -4px 24px rgba(30, 40, 80, 0.08), 0 0 8px rgba(0, 180, 220, 0.04);
+}
+
+/* Bottom bar divider */
+[data-theme="light"] .bottom-bar-divider {
+  color: rgba(80, 100, 160, 0.2);
+}
+
+/* Bottom bar input focus */
+[data-theme="light"] .bottom-input-row textarea:focus {
+  border-color: rgba(0, 180, 220, 0.4);
+}
+
+/* Char count glow */
+[data-theme="light"] .bottom-input-hint #charCount {
+  text-shadow: 0 0 6px rgba(0, 180, 220, 0.2);
+}
+
+/* Reminder button */
+[data-theme="light"] .btn-reminder {
+  border-color: rgba(0, 180, 220, 0.2);
+}
+[data-theme="light"] .btn-reminder:hover {
+  border-color: rgba(0, 180, 220, 0.4);
+  box-shadow: 0 0 8px rgba(0, 180, 220, 0.08);
+}
+[data-theme="light"] .btn-reminder.reminder-active {
+  border-color: rgba(0, 180, 220, 0.4);
+  box-shadow: 0 0 8px rgba(0, 180, 220, 0.1);
+}
+
+/* Filter tabs */
+[data-theme="light"] .filter-tab.active {
+  background: rgba(0, 180, 220, 0.08);
+}
+[data-theme="light"] .filter-tab.active .filter-badge {
+  color: #fff;
+}
+
+/* Search input focus */
+[data-theme="light"] .search-area input:focus {
+  border-color: rgba(0, 180, 220, 0.4);
+}
+
+/* Thought cards */
+[data-theme="light"] .thought-card:hover {
+  border-color: rgba(0, 180, 220, 0.2);
+}
+[data-theme="light"] .thought-card.completed {
+  border-color: rgba(80, 100, 160, 0.06);
+}
+
+/* Card edit area - light background */
+[data-theme="light"] .card-edit-area {
+  background: rgba(240, 242, 248, 0.95);
+  border-color: rgba(0, 180, 220, 0.15);
+  border-left-color: rgba(0, 180, 220, 0.7);
+  box-shadow: inset 0 0 8px rgba(0, 180, 220, 0.03), 0 0 1px rgba(0, 180, 220, 0.15);
+}
+[data-theme="light"] .card-edit-area:focus {
+  border-color: rgba(0, 180, 220, 0.4);
+  border-left-color: var(--accent-cyan);
+  box-shadow: inset 0 0 8px rgba(0, 180, 220, 0.04), 0 0 6px rgba(0, 180, 220, 0.08);
+}
+
+@keyframes editPulseLeftLight {
+  0%, 100% { border-left-color: rgba(0, 180, 220, 0.4); }
+  50% { border-left-color: rgba(0, 180, 220, 0.8); }
+}
+[data-theme="light"] .card-edit-area {
+  animation-name: editAreaAppear, editPulseLeftLight;
+}
+
+/* Edit indicator dot */
+[data-theme="light"] .card-edit-indicator::before {
+  box-shadow: 0 0 4px rgba(0, 180, 220, 0.4);
+}
+
+/* Edit buttons */
+[data-theme="light"] .btn-save-edit {
+  border-color: rgba(0, 180, 220, 0.3);
+  background: rgba(0, 180, 220, 0.06);
+}
+[data-theme="light"] .btn-save-edit:hover {
+  background: rgba(0, 180, 220, 0.12);
+  box-shadow: 0 0 8px rgba(0, 180, 220, 0.08), inset 0 0 4px rgba(0, 180, 220, 0.04);
+  border-color: rgba(0, 180, 220, 0.5);
+}
+[data-theme="light"] .btn-cancel-edit {
+  border-color: rgba(90, 96, 128, 0.2);
+}
+[data-theme="light"] .btn-cancel-edit:hover {
+  border-color: rgba(90, 96, 128, 0.4);
+  background: rgba(90, 96, 128, 0.06);
+}
+
+/* Delete button hover */
+[data-theme="light"] .btn-delete:hover {
+  background: rgba(255, 64, 129, 0.08);
+}
+[data-theme="light"] .btn-edit:hover {
+  background: rgba(0, 180, 220, 0.06);
+  text-shadow: 0 0 4px rgba(0, 180, 220, 0.2);
+}
+
+/* Success flash */
+[data-theme="light"] .thought-card.success-flash {
+  animation-name: successFlashLight;
+}
+@keyframes successFlashLight {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 180, 220, 0.2); }
+  50%  { box-shadow: 0 0 0 6px rgba(0, 180, 220, 0.06); }
+  100% { box-shadow: none; }
+}
+
+/* Card popup */
+[data-theme="light"] .card-popup {
+  background: #ffffff;
+  border-color: rgba(80, 100, 160, 0.15);
+  box-shadow: 0 4px 20px rgba(30, 40, 80, 0.12), 0 0 8px rgba(0, 180, 220, 0.06);
+}
+[data-theme="light"] .card-popup-item:hover {
+  background: rgba(0, 180, 220, 0.06);
+}
+[data-theme="light"] .card-popup-item.selected {
+  background: rgba(0, 180, 220, 0.06);
+}
+
+/* Tag selector */
+[data-theme="light"] .tag-btn.active {
+  border-color: rgba(0, 180, 220, 0.5);
+  background: rgba(0, 180, 220, 0.06);
+  box-shadow: 0 0 6px rgba(0, 180, 220, 0.08);
+}
+[data-theme="light"] .tag-btn:hover {
+  border-color: rgba(0, 180, 220, 0.3);
+}
+[data-theme="light"] .tag-btn-add {
+  border-color: rgba(0, 180, 220, 0.25);
+}
+[data-theme="light"] .tag-btn-add:hover {
+  background: rgba(0, 180, 220, 0.06);
+}
+[data-theme="light"] .tag-add-input {
+  border-color: rgba(0, 180, 220, 0.25);
+}
+
+/* Card tags - same accent colors, adjusted opacity for light bg */
+[data-theme="light"] .card-tag[data-card-tag="Team"]  { background: rgba(255,64,129,0.08); border-color: rgba(255,64,129,0.18); }
+[data-theme="light"] .card-tag[data-card-tag="AI"]    { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.18); }
+[data-theme="light"] .card-tag[data-card-tag="Coding"]{ background: rgba(255,171,64,0.08); border-color: rgba(255,171,64,0.18); }
+[data-theme="light"] .card-tag[data-card-tag="Mine"]  { background: rgba(179,136,255,0.06); border-color: rgba(179,136,255,0.18); }
+
+/* Priority tags */
+[data-theme="light"] .priority-tag.q1 { background: rgba(255,64,129,0.08); border-color: rgba(255,64,129,0.18); }
+[data-theme="light"] .priority-tag.q2 { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.18); }
+[data-theme="light"] .priority-tag.q3 { background: rgba(255,171,64,0.08); border-color: rgba(255,171,64,0.18); }
+[data-theme="light"] .priority-tag.q4 { background: rgba(122,128,168,0.08); border-color: rgba(122,128,168,0.18); }
+
+/* Priority filter active */
+[data-theme="light"] .pfilter-btn.active { background: rgba(30, 30, 60, 0.04); }
+
+/* Tag filter active */
+[data-theme="light"] .tfilter-btn.active {
+  background: rgba(140, 100, 220, 0.06);
+}
+
+/* View toggle active */
+[data-theme="light"] .view-btn.active {
+  background: rgba(0, 180, 220, 0.08);
+}
+
+/* Welcome overlay - light */
+[data-theme="light"] .welcome-overlay {
+  background: #f0f2f8;
+  background-image:
+    radial-gradient(ellipse at 30% 40%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(179, 136, 255, 0.06) 0%, transparent 50%);
+}
+
+/* Fallback notice */
+[data-theme="light"] .fallback-notice {
+  background: rgba(0, 180, 220, 0.06);
+  border-color: rgba(0, 180, 220, 0.15);
+}
+
+/* Empty icon cyber glow */
+[data-theme="light"] .empty-icon-cyber {
+  filter: drop-shadow(0 0 8px rgba(0, 180, 220, 0.15));
+}
+
+/* Tag group header */
+[data-theme="light"] .tag-group-line {
+  background: linear-gradient(90deg, rgba(140, 100, 220, 0.2), transparent);
+}
+[data-theme="light"] .tag-group-count {
+  border-color: rgba(140, 100, 220, 0.12);
+}
+
+/* Reminder badge */
+[data-theme="light"] .reminder-badge {
+  background: rgba(0, 180, 220, 0.06);
+  border-color: rgba(0, 180, 220, 0.18);
+  text-shadow: 0 0 4px rgba(0, 180, 220, 0.15);
+}
+[data-theme="light"] .reminder-badge:hover {
+  background: rgba(0, 180, 220, 0.12);
+  border-color: rgba(0, 180, 220, 0.35);
+  box-shadow: 0 0 8px rgba(0, 180, 220, 0.08);
+}
+
+/* Reminder panel */
+[data-theme="light"] .reminder-panel {
+  background: #ffffff;
+  border-color: rgba(80, 100, 160, 0.15);
+  box-shadow: 0 4px 20px rgba(30, 40, 80, 0.1), 0 0 12px rgba(0, 180, 220, 0.06);
+}
+
+/* Reminder toggle */
+[data-theme="light"] .reminder-toggle-slider {
+  background: #e4e7f0;
+  border-color: rgba(80, 100, 160, 0.15);
+}
+[data-theme="light"] .reminder-toggle-slider::before {
+  background: var(--text-secondary);
+}
+[data-theme="light"] .reminder-toggle input:checked + .reminder-toggle-slider {
+  background: rgba(0, 180, 220, 0.12);
+  border-color: rgba(0, 180, 220, 0.35);
+  box-shadow: 0 0 6px rgba(0, 180, 220, 0.1);
+}
+[data-theme="light"] .reminder-toggle input:checked + .reminder-toggle-slider::before {
+  box-shadow: 0 0 4px rgba(0, 180, 220, 0.4);
+}
+
+/* Reminder datetime input */
+[data-theme="light"] .reminder-datetime-input {
+  border-color: rgba(0, 180, 220, 0.15);
+}
+[data-theme="light"] .reminder-datetime-input:focus {
+  border-color: rgba(0, 180, 220, 0.4);
+  box-shadow: 0 0 4px rgba(0, 180, 220, 0.08);
+}
+
+/* Calendar picker - no dark-mode hack needed in light theme */
+[data-theme="light"] ::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+/* Reminder repeat select */
+[data-theme="light"] .reminder-repeat-select {
+  border-color: rgba(140, 100, 220, 0.15);
+}
+[data-theme="light"] .reminder-repeat-select:focus {
+  border-color: rgba(140, 100, 220, 0.4);
+  box-shadow: 0 0 4px rgba(140, 100, 220, 0.08);
+}
+
+/* Reminder editor popup */
+[data-theme="light"] .reminder-editor-popup {
+  background: #ffffff;
+  border-color: rgba(80, 100, 160, 0.15);
+  box-shadow: 0 4px 20px rgba(30, 40, 80, 0.1), 0 0 12px rgba(0, 180, 220, 0.06);
+}
+
+/* Reminder active text glow */
+[data-theme="light"] .reminder-active {
+  text-shadow: 0 0 6px rgba(0, 180, 220, 0.2);
+}
+
+/* btn-primary gradient text stays white - good on both themes */
+/* btn-secondary needs adjustment */
+[data-theme="light"] .btn-secondary:hover {
+  color: #0090b0;
+  border-color: #0090b0;
+}
+
+/* Priority buttons active states */
+[data-theme="light"] .priority-btn.q1.active { background: rgba(255,64,129,0.08); }
+[data-theme="light"] .priority-btn.q2.active { background: rgba(0,229,255,0.08); }
+[data-theme="light"] .priority-btn.q3.active { background: rgba(255,171,64,0.08); }
+[data-theme="light"] .priority-btn.q4.active { background: rgba(122,128,168,0.08); }
+
+/* Confirm buttons */
+[data-theme="light"] .btn-confirm-yes { border-color: rgba(255,64,129,0.25); }
+[data-theme="light"] .btn-confirm-yes:hover { background: rgba(255,64,129,0.08); }
+
+/* Focus visible outline */
+[data-theme="light"] *:focus-visible {
+  outline-color: #0090b0;
+}
+
+/* @keyframes for reminder glow - lighter */
+@keyframes reminderBtnGlowLight {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 180, 220, 0.08); }
+  50% { box-shadow: 0 0 10px rgba(0, 180, 220, 0.18); }
+}
+[data-theme="light"] .btn-reminder.reminder-active {
+  animation-name: reminderBtnGlowLight;
+}
+
+/* Theme toggle button */
+.btn-theme-toggle {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--font-stack);
+  line-height: 1;
+}
+.btn-theme-toggle:hover {
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
 </style>
 </head>
 <body>
@@ -1490,6 +1848,7 @@ header::before {
         <button class="btn-change-file" id="btnFontDown" type="button" title="缩小字体">A-</button>
         <span id="fontSizeLabel" style="font-size:0.7rem;min-width:28px;text-align:center;">16</span>
         <button class="btn-change-file" id="btnFontUp" type="button" title="放大字体">A+</button>
+        <button class="btn-theme-toggle" id="btnThemeToggle" type="button" title="切换主题">☀️</button>
       </div>
     </div>
 
@@ -2951,6 +3310,33 @@ window._toggleReminder = null;
   });
   document.getElementById('btnFontUp').addEventListener('click', () => {
     if (uiFontSize < FONT_MAX) { uiFontSize++; applyFontSize(); localStorage.setItem(FONT_SIZE_KEY, uiFontSize); }
+  });
+
+  // ==================== 主题切换 / Theme Toggle ====================
+  const THEME_KEY = 'flashmind_theme';
+
+  function getPreferredTheme() {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved) return saved;
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
+    return 'dark';
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('btnThemeToggle');
+    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  let currentTheme = getPreferredTheme();
+  applyTheme(currentTheme);
+
+  document.getElementById('btnThemeToggle').addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(currentTheme);
+    localStorage.setItem(THEME_KEY, currentTheme);
   });
 
   applyFontSize();

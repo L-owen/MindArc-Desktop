@@ -4,81 +4,101 @@
       <stop offset="0%" stop-color="#0d0d2b"/>
       <stop offset="100%" stop-color="#1a0a2e"/>
     </linearGradient>
-    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="spark" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#00e5ff"/>
       <stop offset="50%" stop-color="#448aff"/>
       <stop offset="100%" stop-color="#b388ff"/>
     </linearGradient>
-    <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="sparkGlowGrad" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#00e5ff"/>
-      <stop offset="100%" stop-color="#7c4dff"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="glowStrong">
-      <feGaussianBlur stdDeviation="12" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <linearGradient id="textGrad" x1="0" y1="0" x2="0.3" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="40%" stop-color="#00e5ff"/>
-      <stop offset="70%" stop-color="#448aff"/>
+      <stop offset="40%" stop-color="#448aff"/>
       <stop offset="100%" stop-color="#b388ff"/>
     </linearGradient>
+    <filter id="outerGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="innerGlow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="subtleGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="centerBurst" cx="256" cy="200" r="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
+  <!-- Rounded square background -->
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#neon)" stroke-width="2" opacity="0.3"/>
-  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#neon)" stroke-width="1" opacity="0.15"/>
 
-  <polyline points="120,100 145,200 130,200 170,310 155,310 200,420"
-            fill="none" stroke="url(#bolt)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
-            filter="url(#glow)" opacity="0.8"/>
-  <polyline points="145,200 175,230"
-            fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"
-            filter="url(#glow)" opacity="0.6"/>
-  <polyline points="170,310 200,335"
-            fill="none" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"
-            filter="url(#glow)" opacity="0.5"/>
+  <!-- Subtle radial light burst behind spark -->
+  <circle cx="256" cy="200" r="160" fill="url(#centerBurst)"/>
 
-  <polyline points="392,100 367,200 382,200 342,310 357,310 312,420"
-            fill="none" stroke="url(#bolt)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
-            filter="url(#glow)" opacity="0.8"/>
-  <polyline points="367,200 337,230"
-            fill="none" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round"
-            filter="url(#glow)" opacity="0.6"/>
-  <polyline points="342,310 312,335"
-            fill="none" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"
-            filter="url(#glow)" opacity="0.5"/>
+  <!-- Decorative orbital ring -->
+  <ellipse cx="256" cy="260" rx="190" ry="170" fill="none" stroke="url(#spark)" stroke-width="1" opacity="0.12"/>
 
-  <polyline points="90,220 110,250 95,250 120,290"
-            fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round"
-            filter="url(#glow)" opacity="0.4"/>
-  <polyline points="422,220 402,250 417,250 392,290"
-            fill="none" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"
-            filter="url(#glow)" opacity="0.4"/>
+  <!-- Main spark shape: a bold angular lightning/neural arc -->
+  <!-- This is the core symbol - a zigzag bolt with an "arc" curve -->
+  <!-- At small sizes, it reads as a clean lightning bolt silhouette -->
+  <g filter="url(#outerGlow)">
+    <!-- The main bolt - bold, angular, recognizable at any size -->
+    <path d="
+      M 232 90
+      L 290 90
+      L 258 220
+      L 320 210
+      L 218 422
+      L 256 280
+      L 192 290
+      Z"
+      fill="url(#spark)"
+      opacity="0.95"
+    />
+  </g>
 
-  <text x="256" y="310" font-size="200" font-weight="900" font-family="'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif"
-        fill="url(#textGrad)" text-anchor="middle"
-        filter="url(#glowStrong)">念</text>
+  <!-- Bright center highlight on the bolt for depth -->
+  <path d="
+    M 242 110
+    L 278 110
+    L 260 210
+    L 305 203
+    L 240 370
+    L 260 272
+    L 212 280
+    Z"
+    fill="white"
+    opacity="0.15"
+    filter="url(#innerGlow)"
+  />
 
-  <path d="M156,410 Q180,395 200,410 Q220,425 240,410 Q260,395 280,410 Q300,425 320,410 Q340,395 356,410"
-        fill="none" stroke="url(#neon)" stroke-width="1.5" opacity="0.3"
-        filter="url(#glow)"/>
+  <!-- Small arc emanation lines (neural connections) -->
+  <line x1="195" y1="155" x2="165" y2="130" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" opacity="0.5" filter="url(#subtleGlow)"/>
+  <line x1="325" y1="165" x2="355" y2="140" stroke="#b388ff" stroke-width="2.5" stroke-linecap="round" opacity="0.5" filter="url(#subtleGlow)"/>
+  <line x1="175" y1="290" x2="140" y2="295" stroke="#448aff" stroke-width="2" stroke-linecap="round" opacity="0.35" filter="url(#subtleGlow)"/>
+  <line x1="340" y1="280" x2="375" y2="270" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" opacity="0.35" filter="url(#subtleGlow)"/>
 
-  <circle cx="100" cy="100" r="3" fill="#00e5ff" filter="url(#glow)" opacity="0.6"/>
-  <circle cx="412" cy="100" r="3" fill="#7c4dff" filter="url(#glow)" opacity="0.6"/>
-  <circle cx="100" cy="412" r="2" fill="#448aff" filter="url(#glow)" opacity="0.4"/>
-  <circle cx="412" cy="412" r="2" fill="#00e5ff" filter="url(#glow)" opacity="0.4"/>
+  <!-- Neural dot nodes at arc line endpoints -->
+  <circle cx="165" cy="130" r="4" fill="#00e5ff" opacity="0.6" filter="url(#subtleGlow)"/>
+  <circle cx="355" cy="140" r="4" fill="#b388ff" opacity="0.6" filter="url(#subtleGlow)"/>
+  <circle cx="140" cy="295" r="3" fill="#448aff" opacity="0.4" filter="url(#subtleGlow)"/>
+  <circle cx="375" cy="270" r="3" fill="#00e5ff" opacity="0.4" filter="url(#subtleGlow)"/>
+
+  <!-- Bottom wave arc - the "arc" in MindArc -->
+  <path d="M 140 430 Q 190 405 230 420 Q 260 432 280 418 Q 310 400 372 430"
+        fill="none" stroke="url(#spark)" stroke-width="2" stroke-linecap="round"
+        opacity="0.35" filter="url(#subtleGlow)"/>
 </svg>
