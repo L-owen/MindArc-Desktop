@@ -1,104 +1,99 @@
-<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0d0d2b"/>
-      <stop offset="100%" stop-color="#1a0a2e"/>
+    <linearGradient id="bgL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8eaf0"/>
+      <stop offset="35%" stop-color="#c8cce0"/>
+      <stop offset="65%" stop-color="#2a2060"/>
+      <stop offset="100%" stop-color="#1a1a3e"/>
     </linearGradient>
-    <linearGradient id="spark" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#00e5ff"/>
-      <stop offset="50%" stop-color="#448aff"/>
-      <stop offset="100%" stop-color="#b388ff"/>
+    <linearGradient id="gradV" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="30%" stop-color="#3b82f6"/>
+      <stop offset="60%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
     </linearGradient>
-    <linearGradient id="sparkGlowGrad" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#00e5ff"/>
-      <stop offset="40%" stop-color="#448aff"/>
-      <stop offset="100%" stop-color="#b388ff"/>
+    <linearGradient id="gradH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
     </linearGradient>
-    <filter id="outerGlow">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <linearGradient id="lightningGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#6366f1" flood-opacity="0.4" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="innerGlow">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="glowLightning" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
-    <filter id="subtleGlow">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <radialGradient id="centerBurst" cx="256" cy="200" r="160" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#00e5ff" stop-opacity="0"/>
+    <radialGradient id="sparkGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="35%" stop-color="#22d3ee" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="peakSpark" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="30%" stop-color="#67e8f9" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#22d3ee" flood-opacity="0.3" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
 
-  <!-- Rounded square background -->
-  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="108" fill="url(#bgL)"/>
 
-  <!-- Subtle radial light burst behind spark -->
-  <circle cx="256" cy="200" r="160" fill="url(#centerBurst)"/>
+  <!-- 人 left stroke -->
+  <polygon points="248,80 264,80 148,200 132,200" fill="url(#gradV)" filter="url(#glow)"/>
+  <!-- 人 right stroke -->
+  <polygon points="248,80 264,80 380,200 364,200" fill="url(#gradV)" filter="url(#glow)"/>
+  <!-- 今 horizontal stroke -->
+  <polygon points="112,210 400,210 400,226 112,226" fill="url(#gradH)" filter="url(#glow)"/>
+  <!-- Horizontal highlight -->
+  <polygon points="112,210 400,210 400,215 112,215" fill="#ffffff" opacity="0.3"/>
 
-  <!-- Decorative orbital ring -->
-  <ellipse cx="256" cy="260" rx="190" ry="170" fill="none" stroke="url(#spark)" stroke-width="1" opacity="0.12"/>
+  <!-- ===== 犀利闪电 (centered, replacing 心钩) ===== -->
+  <!-- 
+    Based on current app icon's lightning: M 250 158 L 246 140 L 256 128 L 252 108
+    But MORE SHARP/RUTHLESS:
+    - butt linecap (NOT round — round softens tips)
+    - miter linejoin (sharp corners)
+    - Larger zigzag amplitude for more dramatic angles
+    - Same gradient, same glow filter, same white core, same spark at tip
+    
+    Shape: top → sharp left jog → sharp right jog → bottom tip
+    All straight lines, no curves. Maximum sharpness.
+  -->
 
-  <!-- Main spark shape: a bold angular lightning/neural arc -->
-  <!-- This is the core symbol - a zigzag bolt with an "arc" curve -->
-  <!-- At small sizes, it reads as a clean lightning bolt silhouette -->
-  <g filter="url(#outerGlow)">
-    <!-- The main bolt - bold, angular, recognizable at any size -->
-    <path d="
-      M 232 90
-      L 290 90
-      L 258 220
-      L 320 210
-      L 218 422
-      L 256 280
-      L 192 290
-      Z"
-      fill="url(#spark)"
-      opacity="0.95"
-    />
-  </g>
+  <!-- 犀利闪电主线: butt linecap for razor-sharp endpoints -->
+  <path d="M 256 260 L 234 310 L 278 355 L 256 400"
+        stroke="url(#lightningGrad)" stroke-width="8" fill="none"
+        stroke-linecap="butt" stroke-linejoin="miter"
+        filter="url(#glowLightning)"/>
 
-  <!-- Bright center highlight on the bolt for depth -->
-  <path d="
-    M 242 110
-    L 278 110
-    L 260 210
-    L 305 203
-    L 240 370
-    L 260 272
-    L 212 280
-    Z"
-    fill="white"
-    opacity="0.15"
-    filter="url(#innerGlow)"
-  />
+  <!-- 犀利闪电白色核心线 (inner glow) -->
+  <path d="M 256 260 L 235 310 L 277 355 L 256 400"
+        stroke="white" stroke-width="2.5" fill="none"
+        stroke-linecap="butt" stroke-linejoin="miter" opacity="0.5"/>
 
-  <!-- Small arc emanation lines (neural connections) -->
-  <line x1="195" y1="155" x2="165" y2="130" stroke="#00e5ff" stroke-width="2.5" stroke-linecap="round" opacity="0.5" filter="url(#subtleGlow)"/>
-  <line x1="325" y1="165" x2="355" y2="140" stroke="#b388ff" stroke-width="2.5" stroke-linecap="round" opacity="0.5" filter="url(#subtleGlow)"/>
-  <line x1="175" y1="290" x2="140" y2="295" stroke="#448aff" stroke-width="2" stroke-linecap="round" opacity="0.35" filter="url(#subtleGlow)"/>
-  <line x1="340" y1="280" x2="375" y2="270" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" opacity="0.35" filter="url(#subtleGlow)"/>
+  <!-- Spark at bottom tip (same as app) -->
+  <circle cx="256" cy="400" r="6" fill="url(#sparkGrad)" filter="url(#glowLightning)" opacity="0.85"/>
+  <circle cx="256" cy="400" r="2.5" fill="white" opacity="0.95"/>
 
-  <!-- Neural dot nodes at arc line endpoints -->
-  <circle cx="165" cy="130" r="4" fill="#00e5ff" opacity="0.6" filter="url(#subtleGlow)"/>
-  <circle cx="355" cy="140" r="4" fill="#b388ff" opacity="0.6" filter="url(#subtleGlow)"/>
-  <circle cx="140" cy="295" r="3" fill="#448aff" opacity="0.4" filter="url(#subtleGlow)"/>
-  <circle cx="375" cy="270" r="3" fill="#00e5ff" opacity="0.4" filter="url(#subtleGlow)"/>
+  <!-- 心 three dots -->
+  <polygon points="148,402 156,394 164,402 156,410" fill="#22d3ee" filter="url(#dotGlow)"/>
+  <polygon points="256,440 264,432 272,440 264,448" fill="#6366f1" filter="url(#dotGlow)"/>
+  <polygon points="364,402 372,394 380,402 372,410" fill="#a855f7" filter="url(#dotGlow)"/>
 
-  <!-- Bottom wave arc - the "arc" in MindArc -->
-  <path d="M 140 430 Q 190 405 230 420 Q 260 432 280 418 Q 310 400 372 430"
-        fill="none" stroke="url(#spark)" stroke-width="2" stroke-linecap="round"
-        opacity="0.35" filter="url(#subtleGlow)"/>
+  <!-- Peak spark -->
+  <circle cx="256" cy="80" r="12" fill="url(#peakSpark)"/>
+  <circle cx="256" cy="80" r="4" fill="#ffffff" opacity="0.85"/>
 </svg>
