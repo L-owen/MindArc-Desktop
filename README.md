@@ -23,7 +23,7 @@ A local-first, privacy-respecting thought capture desktop app. All data stays on
 
 ## Screenshots
 
-![alt text](image.png)
+![Main View](docs/screenshot-main.png)
 
 ## Download
 
