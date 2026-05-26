@@ -5,8 +5,8 @@
   "identifier": "com.mindarc.desktop",
   "build": {
     "frontendDist": "../dist",
-    "beforeBuildCommand": "mkdir -p dist && cp index.html dist/index.html",
-    "beforeDevCommand": "mkdir -p dist && cp index.html dist/index.html"
+    "beforeBuildCommand": "node -e \"require('fs').mkdirSync('dist',{recursive:true});require('fs').copyFileSync('index.html','dist/index.html')\"",
+    "beforeDevCommand": "node -e \"require('fs').mkdirSync('dist',{recursive:true});require('fs').copyFileSync('index.html','dist/index.html')\""
   },
   "app": {
     "withGlobalTauri": true,
