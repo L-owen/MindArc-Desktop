@@ -2013,7 +2013,7 @@ window._toggleReminder = null;
       if (!inv) throw new Error('invoke not found on window.__TAURI__');
       return await inv('app_data_path');
     } catch (e) {
-      console.warn('获取应用目录失败:', e);
+      console.warn('Failed to get app data dir:', e);
       return null;
     }
   }
@@ -2027,10 +2027,10 @@ window._toggleReminder = null;
       // 确保目录存在
       try { await mkdir(dir, { recursive: true }); } catch (_) {}
       await writeTextFile(configPath, JSON.stringify(config, null, 2));
-      console.info('配置已保存到:', configPath);
+      console.info('Config saved to:', configPath);
       return true;
     } catch (e) {
-      console.warn('保存配置失败:', e);
+      console.warn('Failed to save config:', e);
       return false;
     }
   }
@@ -2509,7 +2509,7 @@ window._toggleReminder = null;
           const existing = await readTextFile(filePath);
           const data = JSON.parse(existing);
           if (data.thoughts && data.thoughts.length > 0) {
-            console.error('SAFETY: 阻止了用空数据覆写已有文件 / Prevented overwriting file with empty thoughts');
+            console.error('SAFETY: Prevented overwriting file with empty thoughts');
             return;
           }
         } catch (_) {
@@ -2518,7 +2518,7 @@ window._toggleReminder = null;
       }
       await writeToFile({ version: 1, thoughts: thoughts, customTags: customTags });
     } catch (e) {
-      console.error('保存失败:', e);
+      console.error('Failed to save data:', e);
     }
   }
 
