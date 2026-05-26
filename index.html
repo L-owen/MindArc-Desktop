@@ -2486,8 +2486,17 @@ window._toggleReminder = null;
     updateFileStatus(name);
   }
 
-  /** 写入文件 */
+  /** 写入文件（保存前自动备份上一版本） */
   async function writeToFile(data) {
+    // 先备份当前文件内容
+    try {
+      const existing = await readTextFile(filePath);
+      if (existing && existing.trim().length > 0) {
+        await writeTextFile(filePath + '.bak', existing);
+      }
+    } catch (_) {
+      // 文件不存在或为空，无需备份
+    }
     await writeTextFile(filePath, JSON.stringify(data, null, 2));
   }
 
