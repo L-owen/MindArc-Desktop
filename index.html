@@ -1873,6 +1873,7 @@ header::before {
         <span class="file-dot" id="fileDot"></span>
         <span id="fileName">未开卷</span>
         <button class="btn-change-file" id="btnChangeFile" type="button" title="切换数据文件">换卷</button>
+        <button class="btn-change-file" id="btnNewFile" type="button" title="创建新文件">起卷</button>
         <button class="btn-change-file" id="btnFontDown" type="button" title="缩小字体">A-</button>
         <span id="fontSizeLabel" style="font-size:0.7rem;min-width:28px;text-align:center;">16</span>
         <button class="btn-change-file" id="btnFontUp" type="button" title="放大字体">A+</button>
@@ -2443,6 +2444,8 @@ window._toggleReminder = null;
       localStorage.setItem(APP_STATE_KEY, filePath);
       const saved = await saveAppConfig({ filePath: filePath });
       thoughts = [];
+      const name = filePath.split(/[/\\]/).pop();
+      updateFileStatus(name);
       showMainApp();
     } catch (e) {
       console.error('Failed to create file:', e);
@@ -2482,7 +2485,7 @@ window._toggleReminder = null;
         t.reminder = { enabled: false, datetime: null, repeat: 'none' };
       }
     });
-    const name = filePath.split('/').pop() || filePath.split('\\').pop() || filePath;
+    const name = filePath.split(/[/\\]/).pop();
     updateFileStatus(name);
   }
 
@@ -3193,6 +3196,11 @@ window._toggleReminder = null;
   // 切换文件
   $btnChange.addEventListener('click', async () => {
     await openExistingFile();
+  });
+
+  // 起卷 / Create new file
+  document.getElementById('btnNewFile').addEventListener('click', async () => {
+    await createNewFile();
   });
 
   // 输入框
