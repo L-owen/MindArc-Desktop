@@ -225,6 +225,8 @@ header::before {
   padding: 2px 8px;
   border-radius: 5px;
   gap: 3px;
+  min-height: 22px;
+  line-height: 1;
 }
 #bottomBar .priority-btn::before {
   width: 5px;
@@ -245,6 +247,8 @@ header::before {
   font-size: 0.68rem;
   padding: 2px 8px;
   border-radius: 14px;
+  min-height: 22px;
+  line-height: 1;
 }
 #bottomBar .tag-btn-add {
   font-size: 0.75rem;
@@ -393,32 +397,6 @@ header::before {
   flex: 1 1 auto;
   min-width: 120px;
   position: relative;
-}
-
-.search-area input {
-  width: 100%;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 6px 10px 6px 28px;
-  color: var(--text-primary);
-  font-family: var(--font-stack);
-  font-size: 0.82rem;
-  outline: none;
-  transition: border-color var(--transition);
-}
-
-.search-area input::placeholder { color: var(--text-secondary); }
-.search-area input:focus { border-color: rgba(0, 229, 255, 0.4); }
-
-.search-icon {
-  position: absolute;
-  left: 9px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-secondary);
-  font-size: 0.82rem;
-  pointer-events: none;
 }
 
 .search-area input {
@@ -766,8 +744,11 @@ header::before {
 
 /* ========== 空状态 / Empty States ========== */
 .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 60px 20px;
   color: var(--text-secondary);
 }
 
@@ -1029,17 +1010,24 @@ header::before {
   gap: 4px;
   margin-bottom: 6px;
   flex-wrap: wrap;
+  align-items: center;
 }
 .pfilter-btn {
   background: transparent;
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 0.72rem;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
   font-family: var(--font-stack);
   transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 .pfilter-btn.active { color: var(--text-primary); background: rgba(255,255,255,0.05); }
 .pfilter-btn[data-pf="q1"].active { border-color: rgba(255,64,129,0.4); color: #ff4081; }
@@ -1057,6 +1045,24 @@ header::before {
 .header-row-main {
   display: flex;
   gap: 10px;
+  align-items: stretch;
+}
+
+.header-row-main .filter-bar {
+  align-items: center;
+}
+
+.header-row-main .search-area {
+  display: flex;
+  align-items: center;
+}
+
+.header-row-main .search-area input {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.header-row-main .view-toggle {
   align-items: center;
 }
 
@@ -1064,7 +1070,22 @@ header::before {
   display: flex;
   gap: 10px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  height: 26px;
+}
+
+.header-row-filters .priority-filter,
+.header-row-filters .tag-filter {
+  margin-bottom: 0;
+  height: 26px;
+}
+
+.header-row-filters .bottom-bar-label,
+.header-row-filters .bottom-bar-divider {
+  display: inline-block;
+  line-height: 26px;
+  height: 26px;
+  vertical-align: middle;
 }
 
 @media (min-width: 768px) {
@@ -1296,14 +1317,14 @@ header::before {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-  margin-bottom: 6px;
+  align-items: center;
 }
 .tfilter-btn {
   background: transparent;
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 0.72rem;
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
   font-family: var(--font-stack);
@@ -1311,6 +1332,9 @@ header::before {
   display: flex;
   align-items: center;
   gap: 4px;
+  height: 26px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 .tfilter-btn.active {
   color: var(--accent-purple);
@@ -1318,11 +1342,15 @@ header::before {
   background: rgba(179, 136, 255, 0.08);
 }
 .tfilter-count {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text-secondary);
   background: var(--bg-tertiary);
-  padding: 0 5px;
-  border-radius: 8px;
+  padding: 0 4px;
+  border-radius: 4px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
 }
 
 /* ========== 提醒徽章 / Reminder Badge ========== */
@@ -1953,7 +1981,7 @@ window._toggleReminder = null;
   const APP_STATE_KEY = 'flashmind_file_handle';
 
   const { open: dialogOpen, save: dialogSave } = window.__TAURI__.dialog;
-  const { readTextFile, writeTextFile } = window.__TAURI__.fs;
+  const { readTextFile, writeTextFile, mkdir } = window.__TAURI__.fs;
 
   let filePath = null;              // 文件路径
   let thoughts = [];                // 想法数据
@@ -1967,6 +1995,58 @@ window._toggleReminder = null;
   let currentView = 'list';          // 当前视图: 'list' | 'tags'
   let currentReminder = { enabled: false, datetime: null, repeat: 'none' };
   let reminderEngineInterval = null;
+
+  // ==================== 应用配置持久化 / App Config Persistence ====================
+
+  const APP_CONFIG_FILE = 'mindarc-config.json';
+
+  /** 跨平台路径拼接 */
+  function pathJoin(...parts) {
+    const sep = parts[0]?.includes('\\') ? '\\' : '/';
+    return parts.join(sep);
+  }
+
+  /** 获取应用数据目录路径 */
+  async function getAppDataDir() {
+    try {
+      const inv = (window.__TAURI__?.core?.invoke) || (window.__TAURI__?.invoke);
+      if (!inv) throw new Error('invoke not found on window.__TAURI__');
+      return await inv('app_data_path');
+    } catch (e) {
+      console.warn('获取应用目录失败:', e);
+      return null;
+    }
+  }
+
+  /** 保存配置到应用数据目录 */
+  async function saveAppConfig(config) {
+    try {
+      const dir = await getAppDataDir();
+      if (!dir) return false;
+      const configPath = pathJoin(dir, APP_CONFIG_FILE);
+      // 确保目录存在
+      try { await mkdir(dir, { recursive: true }); } catch (_) {}
+      await writeTextFile(configPath, JSON.stringify(config, null, 2));
+      console.info('配置已保存到:', configPath);
+      return true;
+    } catch (e) {
+      console.warn('保存配置失败:', e);
+      return false;
+    }
+  }
+
+  /** 从应用数据目录加载配置 */
+  async function loadAppConfig() {
+    try {
+      const dir = await getAppDataDir();
+      if (!dir) return null;
+      const configPath = pathJoin(dir, APP_CONFIG_FILE);
+      const text = await readTextFile(configPath);
+      return JSON.parse(text);
+    } catch (e) {
+      return null;
+    }
+  }
 
   // ==================== 提醒引擎 / Reminder Engine ====================
 
@@ -2307,7 +2387,18 @@ window._toggleReminder = null;
 
   // ==================== 初始化 / Init ====================
   async function init() {
-    const savedPath = localStorage.getItem(APP_STATE_KEY);
+    let savedPath = null;
+
+    // 优先从应用配置读取（比 localStorage 更可靠）
+    const config = await loadAppConfig();
+    if (config && config.filePath) {
+      savedPath = config.filePath;
+    }
+    // 回退到 localStorage
+    if (!savedPath) {
+      savedPath = localStorage.getItem(APP_STATE_KEY);
+    }
+
     if (savedPath) {
       try {
         filePath = savedPath;
@@ -2319,6 +2410,7 @@ window._toggleReminder = null;
         filePath = null;
       }
     }
+
     $welcome.style.display = 'flex';
   }
 
@@ -2336,10 +2428,12 @@ window._toggleReminder = null;
       const initData = { version: 1, thoughts: [], customTags: [] };
       await writeTextFile(filePath, JSON.stringify(initData, null, 2));
       localStorage.setItem(APP_STATE_KEY, filePath);
+      const saved = await saveAppConfig({ filePath: filePath });
       thoughts = [];
       showMainApp();
     } catch (e) {
       console.error('Failed to create file:', e);
+      alert('创建文件失败: ' + e.message);
     }
   }
 
@@ -2353,6 +2447,7 @@ window._toggleReminder = null;
       if (!selected) return;
       filePath = selected;
       localStorage.setItem(APP_STATE_KEY, filePath);
+      const saved = await saveAppConfig({ filePath: filePath });
       await loadFromFile();
       showMainApp();
     } catch (e) {
@@ -2378,6 +2473,8 @@ window._toggleReminder = null;
     } catch (e) {
       console.error('Failed to read file:', e);
       thoughts = [];
+      customTags = [];
+      throw e;
     }
   }
 
@@ -2510,6 +2607,14 @@ window._toggleReminder = null;
     if (filtered.length === 0) {
       const emptyEl = document.createElement('div');
       emptyEl.className = 'empty-state';
+
+      // 动态计算可视区域高度，使空状态居中
+      const headerEl = document.querySelector('header');
+      const bottomBarEl = document.getElementById('bottomBar');
+      const headerH = headerEl ? headerEl.offsetHeight : 100;
+      const bottomBarH = bottomBarEl ? bottomBarEl.offsetHeight : 150;
+      emptyEl.style.minHeight = Math.max(window.innerHeight - headerH - bottomBarH, 200) + 'px';
+
       if (thoughts.length === 0) {
         emptyEl.innerHTML = '';
         const icon = document.createElement('span');
@@ -2815,6 +2920,14 @@ window._toggleReminder = null;
       result = result.filter(t => t.content.toLowerCase().includes(q));
     }
 
+    // 全卷视图：未了在前、已了沉底（按完成时间升序排列）
+    if (currentFilter === 'all') {
+      const pending = result.filter(t => !t.completedAt);
+      const completed = result.filter(t => t.completedAt)
+        .sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
+      result = pending.concat(completed);
+    }
+
     return result;
   }
 
@@ -2982,6 +3095,13 @@ window._toggleReminder = null;
     if (!hasItems) {
       const emptyEl = document.createElement('div');
       emptyEl.className = 'empty-state';
+
+      const headerEl = document.querySelector('header');
+      const bottomBarEl = document.getElementById('bottomBar');
+      const headerH = headerEl ? headerEl.offsetHeight : 100;
+      const bottomBarH = bottomBarEl ? bottomBarEl.offsetHeight : 150;
+      emptyEl.style.minHeight = Math.max(window.innerHeight - headerH - bottomBarH, 200) + 'px';
+
       const text = document.createElement('div');
       text.className = 'empty-text';
       text.textContent = thoughts.length === 0 ? '落笔写下你的第一个念头' : '翻遍全卷，未见此言';
