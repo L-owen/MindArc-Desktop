@@ -6,10 +6,11 @@
   "permissions": [
     "dialog:default",
     "fs:default",
-    "fs:allow-home-read",
-    "fs:allow-home-write",
+    "fs:allow-home-read-recursive",
+    "fs:allow-home-write-recursive",
     "fs:allow-app-read-recursive",
     "fs:allow-app-write-recursive",
+    "fs:allow-mkdir",
     "notification:default"
   ]
 }
