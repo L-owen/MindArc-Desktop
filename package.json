@@ -3,9 +3,10 @@
   "private": true,
   "version": "0.3.0",
   "scripts": {
+    "copy:dist": "node -e \"require('fs').mkdirSync('dist',{recursive:true});require('fs').copyFileSync('index.html','dist/index.html')\"",
     "tauri": "tauri",
-    "build": "tauri build",
-    "dev": "tauri dev"
+    "build": "npm run copy:dist && tauri build",
+    "dev": "npm run copy:dist && tauri dev"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"

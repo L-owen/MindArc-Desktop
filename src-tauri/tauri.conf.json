@@ -4,9 +4,7 @@
   "version": "0.3.0",
   "identifier": "com.mindarc.desktop",
   "build": {
-    "frontendDist": "../dist",
-    "beforeBuildCommand": "node -e \"require('fs').mkdirSync('dist',{recursive:true});require('fs').copyFileSync('index.html','dist/index.html')\"",
-    "beforeDevCommand": "node -e \"require('fs').mkdirSync('dist',{recursive:true});require('fs').copyFileSync('index.html','dist/index.html')\""
+    "frontendDist": "../dist"
   },
   "app": {
     "withGlobalTauri": true,
