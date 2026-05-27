@@ -2,51 +2,47 @@
 
 > 心有所念，落笔成篇
 
-A local-first, privacy-respecting thought capture desktop app. All data stays on your machine — no cloud, no accounts, no tracking.
+心中念头起时，随手记之。数据尽在本地，不经云端，不涉账号，不留痕迹。
 
-## Features
+## 特性
 
-- **Quick Capture** — One input bar, always visible at the bottom. Jot down any thought in seconds.
-- **Eisenhower Matrix** — Prioritize thoughts with four levels: Urgent & Important, Important, Urgent, Leisure.
-- **Tags** — Organize by context (Team, AI, Coding, Mine) or create your own.
-- **Auto File Memory** — Remembers your last opened file. Pick up right where you left off.
-- **Reminders** — Set one-time or repeating reminders with system notifications.
-- **Auto Backup** — Creates `.bak` backup before every save. Your data is safe.
-- **Dark / Light Theme** — Cyberpunk-inspired dark mode by default, with light mode toggle.
-- **Cross-Platform** — macOS (Apple Silicon + Intel) and Windows.
+- **随手记** — 底栏常驻，念起即书，不费吹灰
+- **轻重缓急** — 急要、重要、紧急、闲记，四档分明
+- **分门别类** — 预置标签，亦可自创，条理井然
+- **开卷即来** — 记忆上次所阅之卷，再启自动续读
+- **时辰提醒** — 设定时刻，准时相告，可循环往复
+- **落笔有痕** — 每次保存皆留备份，万无一失
+- **明暗随心** — 赛博暗色为底，亦可切换明光
 
-## Privacy
+## 隐私
 
-- All data in a single local `.json` file you choose
-- No network calls, no analytics, no telemetry
-- File stored wherever you want — Documents, desktop, external drive
+- 数据唯存一本地 `.json` 文件，由君自择存放之所
+- 不联网、不统计、不窥探，念念皆私
 
-## Screenshots
+## 预览
 
 ![Main View](docs/screenshot-main.png)
 
-## Download
+## 下载
 
-Latest release: [v0.3.0](https://github.com/L-owen/MindArc-Desktop/releases/tag/v0.3.0)
+最新版本：[v0.3.0](https://github.com/L-owen/MindArc-Desktop/releases/tag/v0.3.0)
 
-| Platform | Download |
-|----------|----------|
+| 平台 | 格式 |
+|------|------|
 | macOS (Apple Silicon) | `.dmg` |
 | macOS (Intel) | `.dmg` |
-| Windows | `.exe` or `.msi` |
+| Windows | `.exe` / `.msi` |
 
-## Development
+## 构建
 
 ```bash
-npm install          # Install dependencies
-npm run dev          # Start dev server with hot reload
-npm run build        # Production build
+npm install
+npm run dev       # 开发
+npm run build     # 构建
 ```
 
-**Tech stack:** Tauri v2 + Vanilla JavaScript + CSS Custom Properties
+技术栈：Tauri v2 + Vanilla JS + CSS Custom Properties
 
-No build step for the frontend — edit `index.html` directly.
-
-## License
+## 许可
 
 MIT
